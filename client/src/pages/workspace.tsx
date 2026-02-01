@@ -201,18 +201,20 @@ const CustomEmojiSvgs: Record<string, React.ReactNode> = {
   ),
   "banana": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-      <path d="M4 19c2-6 6-12 14-14" />
-      <path d="M4 19c1 1 2 1.5 3.5 1s4-2.5 6-5.5c2-3 4-6 6.5-8.5" />
-      <path d="M18 5l2-1" />
+      <path d="M7 21c-1 0-2-.5-2-2 0-3 2-8 6-11s8-4 10-3" />
+      <path d="M7 21c2 0 4-1 6-3s4-5 5-8 1-5 3-6" />
+      <path d="M19 3c1 0 2 .5 2 1" />
     </svg>
   ),
   "snail": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-      <path d="M12 14a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-      <path d="M12 12a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
-      <path d="M8 14c-3 0-5 2-5 4h14" />
-      <path d="M4 12l-1-2" />
-      <path d="M6 11l-1-2" />
+      <ellipse cx="14" cy="14" rx="6" ry="5" />
+      <path d="M14 11c0-1.5 1-2.5 2-2.5s2 1 2 2.5-1 2.5-2 2.5" />
+      <path d="M8 14c-2 0-3.5 1-4 2" />
+      <path d="M4 14v-3" />
+      <path d="M6 14v-2" />
+      <circle cx="4" cy="10" r="1" />
+      <circle cx="6" cy="11" r="1" />
     </svg>
   ),
   "euro": (
