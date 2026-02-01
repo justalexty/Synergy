@@ -1571,8 +1571,7 @@ export default function WorkspacePage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__add__" className="sr-only">Select</SelectItem>
-                    {members
+                                        {members
                       .filter((m) => !selectedEvent.attendeeIds.includes(m.id))
                       .map((m) => (
                         <SelectItem key={m.id} value={m.id}>
