@@ -324,11 +324,6 @@ function TopBar({
               >
                 <Filter className="mr-2 h-4 w-4" />
                 Filters
-                {hasActiveFilters && (
-                  <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-                    {filters.status.length + filters.priority.length + (filters.projectId ? 1 : 0) + (filters.assigneeId ? 1 : 0)}
-                  </Badge>
-                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72" align="end">
