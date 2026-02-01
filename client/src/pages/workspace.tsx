@@ -1291,7 +1291,7 @@ export default function WorkspacePage() {
                   }}
                 >
                   <SelectTrigger data-testid="select-add-assignee">
-                    <SelectValue placeholder="Add assignee..." />
+                    <SelectValue placeholder="Add..." />
                   </SelectTrigger>
                   <SelectContent>
                     {members
