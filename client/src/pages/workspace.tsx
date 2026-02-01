@@ -171,7 +171,7 @@ function TopBar({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search tasks, docs, events…"
-            className="border-0 bg-transparent px-0 focus-visible:ring-0"
+            className="border-0 bg-transparent pl-1 pr-0 focus-visible:ring-0"
             data-testid="input-search"
           />
         </div>
