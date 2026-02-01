@@ -31,6 +31,7 @@ import {
   Search,
   Trash2,
   Users,
+  X,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -1102,33 +1103,58 @@ export default function WorkspacePage() {
               </div>
               <div className="space-y-2">
                 <Label>Assignees</Label>
-                <div className="flex flex-wrap gap-2 rounded-md border p-2" data-testid="assignees-container">
-                  {members.map((m) => {
-                    const isSelected = selectedTask.assigneeIds.includes(m.id);
+                <div className="flex flex-wrap gap-2" data-testid="assignees-container">
+                  {selectedTask.assigneeIds.map((id) => {
+                    const m = members.find((mem) => mem.id === id);
+                    if (!m) return null;
                     return (
-                      <button
+                      <div
                         key={m.id}
-                        type="button"
-                        onClick={() => {
-                          const newIds = isSelected
-                            ? selectedTask.assigneeIds.filter((id) => id !== m.id)
-                            : [...selectedTask.assigneeIds, m.id];
-                          setSelectedTask({ ...selectedTask, assigneeIds: newIds });
-                        }}
-                        className={cn(
-                          "flex items-center gap-1.5 rounded-full border px-2 py-1 text-sm transition-colors",
-                          isSelected
-                            ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]"
-                            : "border-border hover:bg-muted"
-                        )}
-                        data-testid={`button-assignee-${m.id}`}
+                        className="flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] px-2 py-1 text-sm text-[hsl(var(--primary))]"
                       >
                         <div className={cn("h-5 w-5 rounded-full border bg-gradient-to-br", m.color)} />
                         {m.name}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedTask({
+                              ...selectedTask,
+                              assigneeIds: selectedTask.assigneeIds.filter((i) => i !== m.id),
+                            });
+                          }}
+                          className="ml-1 hover:text-destructive"
+                          data-testid={`button-remove-assignee-${m.id}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
+                <Select
+                  value=""
+                  onValueChange={(v) => {
+                    if (!selectedTask.assigneeIds.includes(v)) {
+                      setSelectedTask({ ...selectedTask, assigneeIds: [...selectedTask.assigneeIds, v] });
+                    }
+                  }}
+                >
+                  <SelectTrigger data-testid="select-add-assignee">
+                    <SelectValue placeholder="Add assignee..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members
+                      .filter((m) => !selectedTask.assigneeIds.includes(m.id))
+                      .map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          <div className="flex items-center gap-2">
+                            <div className={cn("h-5 w-5 rounded-full border bg-gradient-to-br", m.color)} />
+                            {m.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex justify-between gap-2 pt-2">
                 <Button
@@ -1205,33 +1231,58 @@ export default function WorkspacePage() {
               </div>
               <div className="space-y-2">
                 <Label>Attendees</Label>
-                <div className="flex flex-wrap gap-2 rounded-md border p-2" data-testid="attendees-container">
-                  {members.map((m) => {
-                    const isSelected = selectedEvent.attendeeIds.includes(m.id);
+                <div className="flex flex-wrap gap-2" data-testid="attendees-container">
+                  {selectedEvent.attendeeIds.map((id) => {
+                    const m = members.find((mem) => mem.id === id);
+                    if (!m) return null;
                     return (
-                      <button
+                      <div
                         key={m.id}
-                        type="button"
-                        onClick={() => {
-                          const newIds = isSelected
-                            ? selectedEvent.attendeeIds.filter((id) => id !== m.id)
-                            : [...selectedEvent.attendeeIds, m.id];
-                          setSelectedEvent({ ...selectedEvent, attendeeIds: newIds });
-                        }}
-                        className={cn(
-                          "flex items-center gap-1.5 rounded-full border px-2 py-1 text-sm transition-colors",
-                          isSelected
-                            ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]"
-                            : "border-border hover:bg-muted"
-                        )}
-                        data-testid={`button-attendee-${m.id}`}
+                        className="flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] px-2 py-1 text-sm text-[hsl(var(--primary))]"
                       >
                         <div className={cn("h-5 w-5 rounded-full border bg-gradient-to-br", m.color)} />
                         {m.name}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedEvent({
+                              ...selectedEvent,
+                              attendeeIds: selectedEvent.attendeeIds.filter((i) => i !== m.id),
+                            });
+                          }}
+                          className="ml-1 hover:text-destructive"
+                          data-testid={`button-remove-attendee-${m.id}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
+                <Select
+                  value=""
+                  onValueChange={(v) => {
+                    if (!selectedEvent.attendeeIds.includes(v)) {
+                      setSelectedEvent({ ...selectedEvent, attendeeIds: [...selectedEvent.attendeeIds, v] });
+                    }
+                  }}
+                >
+                  <SelectTrigger data-testid="select-add-attendee">
+                    <SelectValue placeholder="Add attendee..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members
+                      .filter((m) => !selectedEvent.attendeeIds.includes(m.id))
+                      .map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          <div className="flex items-center gap-2">
+                            <div className={cn("h-5 w-5 rounded-full border bg-gradient-to-br", m.color)} />
+                            {m.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex justify-between gap-2 pt-2">
                 <Button
