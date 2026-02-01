@@ -51,27 +51,35 @@ export default function LoginPage({ onAuthenticated }: Props) {
   }, [isConnected, address, onAuthenticated]);
 
   async function handleLogin() {
+    console.log("[login] handleLogin called, isConnected:", isConnected, "address:", address);
     setStatus("connecting");
     setError(null);
     pendingVerification.current = true;
 
     if (isConnected && address) {
+      console.log("[login] Already connected, verifying wallet:", address);
       setStatus("verifying");
       try {
+        console.log("[login] Calling /api/auth/verify...");
         const res = await fetch("/api/auth/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ walletAddress: address }),
         });
 
+        console.log("[login] Response status:", res.status);
         const data = await res.json();
+        console.log("[login] Response data:", data);
 
         if (data.authorized) {
+          console.log("[login] Authorized! Calling onAuthenticated");
           onAuthenticated(address, data.userName);
         } else {
+          console.log("[login] Not authorized, showing denied");
           setStatus("denied");
         }
       } catch (err: any) {
+        console.error("[login] Error verifying:", err);
         setError(err?.message || "Verification failed");
         setStatus("idle");
       }
