@@ -180,7 +180,7 @@
   .bg-radial {
     background-image: radial-gradient(
       900px circle at 20% -10%,
-      hsl(var(--primary) / 0.22),
+      hsl(var(--primary) / 0.24),
       transparent 56%
     );
   }
@@ -188,9 +188,29 @@
   .bg-radial-2 {
     background-image: radial-gradient(
       900px circle at 90% 0%,
-      hsl(var(--accent) / 0.18),
+      hsl(var(--accent) / 0.20),
       transparent 52%
     );
+  }
+
+  .neon-ring {
+    box-shadow:
+      0 0 0 1px hsl(var(--primary) / 0.22),
+      0 0 0 6px hsl(var(--primary) / 0.08),
+      0 10px 40px hsl(var(--primary) / 0.16);
+  }
+
+  .neon-accent {
+    box-shadow:
+      0 0 0 1px hsl(var(--accent) / 0.22),
+      0 0 0 6px hsl(var(--accent) / 0.08),
+      0 10px 40px hsl(var(--accent) / 0.14);
+  }
+
+  .text-neon {
+    text-shadow:
+      0 0 20px hsl(var(--primary) / 0.30),
+      0 0 44px hsl(var(--accent) / 0.20);
   }
 
   .shadow-soft {

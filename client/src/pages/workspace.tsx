@@ -30,7 +30,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import WalletConnectLogin from "@/components/walletconnect-login";
 import { cn } from "@/lib/utils";
 
 type Status = "todo" | "in_progress" | "blocked" | "done";
@@ -235,17 +236,20 @@ function TopBar({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <div
-              className="grid h-9 w-9 place-items-center rounded-xl border bg-card/70 shadow-soft"
+              className="grid h-9 w-9 place-items-center rounded-xl border bg-card/70 shadow-soft neon-ring"
               data-testid="badge-brand"
             >
-              <Sparkles className="h-4 w-4 text-[hsl(var(--primary))]" strokeWidth={2.4} />
+              <Sparkles
+                className="h-4 w-4 text-[hsl(var(--primary))] text-neon"
+                strokeWidth={2.4}
+              />
             </div>
             <div className="min-w-0">
               <div
                 className="font-display text-[18px] font-[720] tracking-[-0.02em]"
                 data-testid="text-app-title"
               >
-                Todewy
+                Synergy
               </div>
               <div
                 className="text-xs text-muted-foreground"
@@ -267,7 +271,7 @@ function TopBar({
             Filters
           </Button>
           <Button
-            className="shadow-soft"
+            className="shadow-soft neon-ring"
             onClick={onCreate}
             data-testid="button-create"
           >
@@ -778,6 +782,11 @@ export default function WorkspacePage() {
   return (
     <AppShell>
       <TopBar query={query} setQuery={setQuery} onCreate={onCreate} />
+
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_420px]">
+        <div className="min-w-0" />
+        <WalletConnectLogin onConnected={() => {}} />
+      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
         <LeftRail active={active} setActive={setActive} />
