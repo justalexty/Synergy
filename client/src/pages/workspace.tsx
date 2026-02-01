@@ -201,9 +201,9 @@ const CustomEmojiSvgs: Record<string, React.ReactNode> = {
   ),
   "lemon": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-      <ellipse cx="12" cy="12" rx="8" ry="6" />
-      <path d="M4 12 Q2 12 2 10" />
-      <path d="M20 12 Q22 12 22 10" />
+      <ellipse cx="12" cy="12" rx="8" ry="5" transform="rotate(-30 12 12)" />
+      <path d="M5 8 Q3 7 3 5" />
+      <path d="M19 16 Q21 17 21 19" />
     </svg>
   ),
   "snail": (
