@@ -131,15 +131,11 @@ function TopBar({
             </div>
             <div className="min-w-0">
               <div
-                className="font-display text-[18px] font-[720] tracking-[-0.02em]"
+                className="font-display text-[22px] font-[720] tracking-[-0.02em]"
                 data-testid="text-app-title"
               >
                 Synergy
               </div>
-              <div
-                className="font-retro text-[11px] text-muted-foreground uppercase tracking-wide"
-                data-testid="text-app-subtitle"
-              >workflow terminal</div>
             </div>
           </div>
         </div>
