@@ -115,7 +115,9 @@ export async function registerRoutes(
 
   app.post("/api/tasks", async (req, res) => {
     try {
-      const data = insertTaskSchema.parse(req.body);
+      const body = { ...req.body };
+      if (body.due) body.due = new Date(body.due);
+      const data = insertTaskSchema.parse(body);
       const task = await storage.createTask(data);
       res.status(201).json(task);
     } catch (error) {
@@ -128,7 +130,9 @@ export async function registerRoutes(
 
   app.patch("/api/tasks/:id", async (req, res) => {
     try {
-      const data = insertTaskSchema.partial().parse(req.body);
+      const body = { ...req.body };
+      if (body.due) body.due = new Date(body.due);
+      const data = insertTaskSchema.partial().parse(body);
       const task = await storage.updateTask(req.params.id, data);
       if (!task) {
         return res.status(404).json({ error: "Task not found" });
