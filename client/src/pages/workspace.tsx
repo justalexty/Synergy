@@ -76,7 +76,7 @@ function statusClass(s: Status) {
     case "blocked":
       return "bg-[hsl(355_60%_92%)] text-[hsl(355_55%_45%)] border-[hsl(355_50%_78%)]";
     case "done":
-      return "bg-[hsl(30_35%_88%)] text-[hsl(25_50%_32%)] border-[hsl(28_30%_70%)]";
+      return "bg-[hsl(24_45%_82%)] text-[hsl(20_55%_28%)] border-[hsl(22_40%_62%)]";
   }
 }
 
