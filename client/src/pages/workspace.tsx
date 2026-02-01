@@ -107,7 +107,7 @@ function priorityClass(p: string) {
   }
 }
 
-const EMOJI_OPTIONS = ["star4", "diamond-dot", "circle-dashed", "diamond", "triangle", "circle", "square", "diamond-outline", "triangle-down", "sparkle", "star", "hexagon", "ballot", "ticket", "psi", "cloud", "banana", "snail", "euro", "dollar", "moon"];
+const EMOJI_OPTIONS = ["star4", "diamond-dot", "circle-dashed", "diamond", "triangle", "circle", "square", "diamond-outline", "triangle-down", "sparkle", "star", "hexagon", "ballot", "ticket", "psi", "cloud", "lemon", "snail", "euro", "dollar", "moon"];
 
 const CustomEmojiSvgs: Record<string, React.ReactNode> = {
   "star4": (
@@ -199,24 +199,23 @@ const CustomEmojiSvgs: Record<string, React.ReactNode> = {
       <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
     </svg>
   ),
-  "banana": (
+  "lemon": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-      <path d="M4 20 Q4 8 20 4" />
-      <path d="M6 19 Q8 10 19 6" />
-      <path d="M4 20 Q5 21 6 19" />
-      <path d="M19 6 Q20 5 20 4" />
+      <ellipse cx="12" cy="12" rx="8" ry="6" />
+      <path d="M4 12 Q2 12 2 10" />
+      <path d="M20 12 Q22 12 22 10" />
     </svg>
   ),
   "snail": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-      <circle cx="14" cy="10" r="6" />
-      <circle cx="14" cy="10" r="3" />
-      <circle cx="14" cy="10" r="1" />
-      <path d="M8 13 Q4 14 3 17" />
-      <path d="M5 10 L4 6" />
-      <path d="M7 11 L7 7" />
-      <circle cx="4" cy="5" r="1" />
-      <circle cx="7" cy="6" r="1" />
+      <circle cx="14" cy="14" r="6" />
+      <circle cx="14" cy="14" r="3" />
+      <circle cx="14" cy="14" r="1" />
+      <path d="M8 11 Q4 10 3 7" />
+      <path d="M5 14 L4 18" />
+      <path d="M7 13 L7 17" />
+      <circle cx="4" cy="19" r="1" />
+      <circle cx="7" cy="18" r="1" />
     </svg>
   ),
   "euro": (
@@ -256,7 +255,7 @@ const LegacyEmojiMap: Record<string, string> = {
   "🎟": "ticket",
   "ψ": "psi",
   "☁": "cloud",
-  "⌒": "banana",
+  "⌒": "lemon",
   "@": "snail",
   "€": "euro",
   "$": "dollar",
