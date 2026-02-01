@@ -356,18 +356,32 @@ function MetricCard({
   label,
   value,
   hint,
+  selected,
+  onClick,
 }: {
   label: string;
   value: string;
   hint: string;
+  selected?: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <Card className="glass shadow-soft rounded-2xl p-4">
+    <button
+      className={cn(
+        "glass shadow-soft rounded-2xl p-4 text-left transition-all hover:-translate-y-[1px] hover:shadow-float cursor-pointer w-full",
+        selected && "ring-2 ring-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.08)]"
+      )}
+      onClick={onClick}
+      data-testid={`button-metric-${label}`}
+    >
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground" data-testid={`text-metric-${label}`}>
           {label}
         </div>
-        <div className="h-2 w-2 rounded-full bg-[hsl(var(--primary)/0.45)]" />
+        <div className={cn(
+          "h-2 w-2 rounded-full",
+          selected ? "bg-[hsl(var(--primary))]" : "bg-[hsl(var(--primary)/0.45)]"
+        )} />
       </div>
       <div
         className="mt-2 font-display text-3xl font-[720] tracking-[-0.03em]"
@@ -378,7 +392,7 @@ function MetricCard({
       <div className="mt-2 text-xs text-muted-foreground" data-testid={`hint-metric-${label}`}>
         {hint}
       </div>
-    </Card>
+    </button>
   );
 }
 
@@ -683,6 +697,7 @@ export default function WorkspacePage() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [metricFilter, setMetricFilter] = useState<"week" | "progress" | "focus" | null>(null);
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -738,8 +753,39 @@ export default function WorkspacePage() {
     return new Map(members.map((m) => [m.id, m] as const));
   }, [members]);
 
+  const now = new Date();
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+  const thisWeekTasks = useMemo(() => 
+    tasks.filter((t) => t.due && t.due >= weekStart && t.due <= weekEnd),
+    [tasks, weekStart, weekEnd]
+  );
+
+  const inProgressTasks = useMemo(() => 
+    tasks.filter((t) => t.status === "in_progress"),
+    [tasks]
+  );
+
+  const activeProjects = useMemo(() => {
+    const activeProjectIds = new Set(
+      tasks.filter((t) => t.status === "in_progress").map((t) => t.projectId)
+    );
+    return projects.filter((p) => activeProjectIds.has(p.id));
+  }, [tasks, projects]);
+
   const filteredTasks = useMemo(() => {
     let result = tasks;
+    
+    if (metricFilter === "week") {
+      result = thisWeekTasks;
+    } else if (metricFilter === "progress") {
+      result = inProgressTasks;
+    } else if (metricFilter === "focus") {
+      const activeProjectIds = new Set(activeProjects.map((p) => p.id));
+      result = result.filter((t) => activeProjectIds.has(t.projectId));
+    }
+    
     if (selectedProject) {
       result = result.filter((t) => t.projectId === selectedProject);
     }
@@ -754,7 +800,7 @@ export default function WorkspacePage() {
         p.toLowerCase().includes(q)
       );
     });
-  }, [query, tasks, projects, selectedProject]);
+  }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects]);
 
   function onCreate() {
     if (projects.length === 0 || members.length === 0) return;
@@ -817,9 +863,27 @@ export default function WorkspacePage() {
             {active === "overview" ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <MetricCard label="This week" value="12" hint="items scheduled" />
-                  <MetricCard label="In progress" value="4" hint="tasks moving" />
-                  <MetricCard label="Focus" value="2" hint="projects active" />
+                  <MetricCard 
+                    label="This week" 
+                    value={String(thisWeekTasks.length)} 
+                    hint="items scheduled" 
+                    selected={metricFilter === "week"}
+                    onClick={() => setMetricFilter(metricFilter === "week" ? null : "week")}
+                  />
+                  <MetricCard 
+                    label="In progress" 
+                    value={String(inProgressTasks.length)} 
+                    hint="tasks moving" 
+                    selected={metricFilter === "progress"}
+                    onClick={() => setMetricFilter(metricFilter === "progress" ? null : "progress")}
+                  />
+                  <MetricCard 
+                    label="Focus" 
+                    value={String(activeProjects.length)} 
+                    hint="projects active" 
+                    selected={metricFilter === "focus"}
+                    onClick={() => setMetricFilter(metricFilter === "focus" ? null : "focus")}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_420px]">
