@@ -1568,10 +1568,10 @@ export default function WorkspacePage() {
                   }}
                 >
                   <SelectTrigger data-testid="select-add-attendee">
-                    <SelectValue placeholder="Add attendee" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__add__" className="text-muted-foreground">Add attendee...</SelectItem>
+                    <SelectItem value="__add__" className="sr-only">Select</SelectItem>
                     {members
                       .filter((m) => !selectedEvent.attendeeIds.includes(m.id))
                       .map((m) => (
