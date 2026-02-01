@@ -53,6 +53,19 @@ export interface IStorage {
 }
 
 export class DbStorage implements IStorage {
+  async initialize(): Promise<void> {
+    const alexWallet = "0xf391eee70a073e9ed53ebd3b9836644fdfe1b7c6";
+    const existing = await this.getApprovedWallet(alexWallet);
+    if (!existing) {
+      console.log("[storage] Seeding approved wallet for Alex...");
+      await this.createApprovedWallet({
+        walletAddress: alexWallet,
+        userName: "Alex",
+      });
+      console.log("[storage] Approved wallet seeded successfully");
+    }
+  }
+
   // Approved Wallets
   async getApprovedWallet(walletAddress: string): Promise<ApprovedWallet | undefined> {
     const result = await db

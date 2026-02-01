@@ -1,0 +1,24 @@
+Discarding cache for address eip155:1:0xF391EEe70A073e9ed53EBD3b9836644FdFe1b7C6
+/manifest.json:1  Failed to load resource: net::ERR_FAILED
+(index):1 <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">
+index-DXVhdowf.js:7209 [login] handleLogin called, isConnected: true address: 0xF391EEe70A073e9ed53EBD3b9836644FdFe1b7C6
+index-DXVhdowf.js:7209 [login] Already connected, verifying wallet: 0xF391EEe70A073e9ed53EBD3b9836644FdFe1b7C6
+index-DXVhdowf.js:7209 [login] Calling /api/auth/verify...
+index-DXVhdowf.js:7209 [login] Response status: 200
+index-DXVhdowf.js:7209 [login] Response data: {"authorized":false}
+index-DXVhdowf.js:7209 [login] Not authorized, data.authorized = false
+index-DXVhdowf.js:7209 [login] handleLogin called, isConnected: false address: undefined
+(index):1 The resource https://fonts.reown.com/KHTeka-Medium.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+pulse.walletconnect.org/batch?projectId=89d6083434e5c857f7402c7bba817a49&st=appkit&sv=react-ethers-1.8.17:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+(index):1 The resource https://fonts.reown.com/KHTeka-Medium.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+index-DXVhdowf.js:54 Discarding cache for address eip155:1:0xF391EEe70A073e9ed53EBD3b9836644FdFe1b7C6
+index-DXVhdowf.js:7209 [login:effect] Calling /api/auth/verify for 0xF391EEe70A073e9ed53EBD3b9836644FdFe1b7C6
+index-DXVhdowf.js:7209 [login:effect] Response status: 200
+index-DXVhdowf.js:7209 [login:effect] Response data: {"authorized":false}
+index-DXVhdowf.js:7209 [login:effect] Not authorized, data.authorized = false
+pulse.walletconnect.org/batch?projectId=89d6083434e5c857f7402c7bba817a49&st=appkit&sv=react-ethers-1.8.17:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+(index):1 The resource https://fonts.reown.com/KHTeka-Medium.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+Access to fetch at 'https://replit.com/__replshield?redirect=https%3A%2F%2Fsomeday-synergy.replit.app%2Fmanifest.json' (redirected from 'https://someday-synergy.replit.app/manifest.json') from origin 'https://someday-synergy.replit.app' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+The FetchEvent for "https://someday-synergy.replit.app/manifest.json" resulted in a network error response: the promise was rejected.
+2sw.js:1 Uncaught (in promise) TypeError: Failed to convert value to 'Response'.
+(index):1 The resource https://fonts.reown.com/KHTeka-Medium.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
