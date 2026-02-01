@@ -1333,13 +1333,8 @@ export default function WorkspacePage() {
               <div className="space-y-4">
                 <div className="rounded-2xl border bg-card/70 p-4 shadow-soft">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <div className="font-display text-2xl font-[720] tracking-[-0.03em]" data-testid="text-tasks-title">
-                        Tasks
-                      </div>
-                      <div className="text-xs text-muted-foreground" data-testid="text-tasks-subtitle">
-                        Lightweight list view (mock data)
-                      </div>
+                    <div className="font-display text-2xl font-[720] tracking-[-0.03em]" data-testid="text-tasks-title">
+                      Tasks
                     </div>
 
                     <div className="flex items-center gap-2">
