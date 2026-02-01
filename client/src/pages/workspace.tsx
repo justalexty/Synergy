@@ -1231,7 +1231,7 @@ export default function WorkspacePage() {
                     onClick={() => setMetricFilter(metricFilter === "week" ? null : "week")}
                   />
                   <MetricCard 
-                    label="In progress" 
+                    label="In Progress" 
                     value={String(inProgressTasks.length)} 
                     hint="tasks moving" 
                     selected={metricFilter === "progress"}
