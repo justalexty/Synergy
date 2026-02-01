@@ -930,6 +930,7 @@ export default function WorkspacePage() {
   const [isNewTask, setIsNewTask] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isNewEvent, setIsNewEvent] = useState(false);
+  const [eventDateTouched, setEventDateTouched] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [metricFilter, setMetricFilter] = useState<"week" | "progress" | "focus" | null>(null);
@@ -1166,6 +1167,7 @@ export default function WorkspacePage() {
       attendeeIds: [],
     });
     setIsNewEvent(true);
+    setEventDateTouched(false);
   }
 
   function addQuickTask() {
@@ -1261,7 +1263,7 @@ export default function WorkspacePage() {
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); }} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
@@ -1322,7 +1324,7 @@ export default function WorkspacePage() {
                     events={sortedEvents}
                     tasks={tasks}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); }} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
@@ -1605,7 +1607,7 @@ export default function WorkspacePage() {
         </DialogContent>
       </Dialog>
       {/* Event Detail Dialog */}
-      <Dialog open={!!selectedEvent} onOpenChange={(open) => { if (!open) { setSelectedEvent(null); setIsNewEvent(false); } }}>
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => { if (!open) { setSelectedEvent(null); setIsNewEvent(false); setEventDateTouched(false); } }}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>{isNewEvent ? "New Meeting" : "Edit Meeting"}</DialogTitle>
@@ -1681,7 +1683,7 @@ export default function WorkspacePage() {
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-event-date">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
+                      {(!isNewEvent || eventDateTouched) && selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -1693,6 +1695,7 @@ export default function WorkspacePage() {
                           const existing = new Date(selectedEvent.start);
                           date.setHours(existing.getHours(), existing.getMinutes());
                           setSelectedEvent({ ...selectedEvent, start: date });
+                          setEventDateTouched(true);
                         }
                       }}
                       initialFocus
@@ -1704,13 +1707,14 @@ export default function WorkspacePage() {
                 <Label>Time</Label>
                 <Input
                   type="time"
-                  value={format(new Date(selectedEvent.start), "HH:mm")}
+                  value={(!isNewEvent || eventDateTouched) ? format(new Date(selectedEvent.start), "HH:mm") : ""}
                   onChange={(e) => {
                     if (e.target.value) {
                       const [hours, minutes] = e.target.value.split(":").map(Number);
                       const newDate = new Date(selectedEvent.start);
                       newDate.setHours(hours, minutes);
                       setSelectedEvent({ ...selectedEvent, start: newDate });
+                      setEventDateTouched(true);
                     }
                   }}
                   data-testid="input-event-time"
@@ -1732,7 +1736,7 @@ export default function WorkspacePage() {
                   </Button>
                 )}
                 <div className="flex gap-2 ml-auto">
-                  <Button variant="secondary" onClick={() => { setSelectedEvent(null); setIsNewEvent(false); }} data-testid="button-cancel-event">
+                  <Button variant="secondary" onClick={() => { setSelectedEvent(null); setIsNewEvent(false); setEventDateTouched(false); }} data-testid="button-cancel-event">
                     Cancel
                   </Button>
                   <Button
@@ -1757,6 +1761,7 @@ export default function WorkspacePage() {
                       }
                       setSelectedEvent(null);
                       setIsNewEvent(false);
+                      setEventDateTouched(false);
                     }}
                     data-testid="button-save-event"
                   >
