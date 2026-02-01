@@ -825,39 +825,37 @@ export default function WorkspacePage() {
   }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects]);
 
   function onCreate() {
-    if (projects.length === 0 || members.length === 0) return;
+    if (projects.length === 0) return;
     
     createTaskMutation.mutate({
-      title: "New task (draft)",
+      title: "",
       status: "todo",
       projectId: projects[0].id,
-      assigneeIds: [members[0].id],
-      due: selected,
+      assigneeIds: [],
+      due: null,
       priority: "Medium",
     });
   }
 
   function addQuickEvent() {
-    if (members.length < 2) return;
-    
     createEventMutation.mutate({
-      title: "New meeting",
+      title: "",
       start: selected,
       end: null,
       color: "primary",
-      attendeeIds: [members[0].id, members[1].id],
+      attendeeIds: [],
     });
   }
 
   function addQuickTask() {
-    if (projects.length === 0 || members.length === 0) return;
+    if (projects.length === 0) return;
     
     createTaskMutation.mutate({
-      title: "New task",
+      title: "",
       status: "todo",
       projectId: projects[0].id,
-      assigneeIds: [members[0].id],
-      due: selected,
+      assigneeIds: [],
+      due: null,
       priority: "Medium",
     });
   }
