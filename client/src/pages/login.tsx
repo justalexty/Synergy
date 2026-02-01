@@ -141,6 +141,11 @@ export default function LoginPage({ onAuthenticated }: Props) {
                   <p className="text-sm text-muted-foreground mt-1">
                     Your wallet is not authorized to access this workspace.
                   </p>
+                  {address && (
+                    <p className="text-xs text-muted-foreground/70 mt-2 font-mono break-all">
+                      {address}
+                    </p>
+                  )}
                 </div>
               </div>
               <Button
