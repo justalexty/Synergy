@@ -65,22 +65,22 @@ function statusClass(s: Status) {
     case "todo":
       return "bg-[hsl(35_20%_88%)] text-[hsl(25_30%_40%)] border-[hsl(30_20%_75%)]";
     case "in_progress":
-      return "bg-[hsl(16_85%_94%)] text-[hsl(16_75%_42%)] border-[hsl(16_70%_80%)]";
+      return "bg-[hsl(145_45%_90%)] text-[hsl(150_50%_32%)] border-[hsl(145_40%_75%)]";
     case "blocked":
       return "bg-[hsl(355_60%_92%)] text-[hsl(355_55%_45%)] border-[hsl(355_50%_78%)]";
     case "done":
-      return "bg-[hsl(145_40%_90%)] text-[hsl(150_45%_35%)] border-[hsl(145_35%_75%)]";
+      return "bg-[hsl(300_45%_92%)] text-[hsl(305_50%_38%)] border-[hsl(300_40%_78%)]";
   }
 }
 
 function priorityClass(p: string) {
   switch (p) {
     case "Low":
-      return "bg-[hsl(35_20%_88%)] text-[hsl(25_30%_40%)] border-[hsl(30_20%_75%)]";
+      return "bg-[hsl(230_45%_92%)] text-[hsl(235_50%_42%)] border-[hsl(230_40%_80%)]";
     case "Medium":
       return "bg-[hsl(45_80%_90%)] text-[hsl(40_70%_35%)] border-[hsl(42_65%_75%)]";
     case "High":
-      return "bg-[hsl(355_60%_92%)] text-[hsl(355_55%_45%)] border-[hsl(355_50%_78%)]";
+      return "bg-[hsl(16_85%_92%)] text-[hsl(16_80%_45%)] border-[hsl(16_70%_78%)]";
   }
 }
 
