@@ -234,9 +234,36 @@ const CustomEmojiSvgs: Record<string, React.ReactNode> = {
   ),
 };
 
+// Backward compatibility: map old Unicode characters to the same SVGs
+const LegacyEmojiMap: Record<string, string> = {
+  "✦": "star4",
+  "◈": "diamond-dot",
+  "◌": "circle-dashed",
+  "◆": "diamond",
+  "△": "triangle",
+  "○": "circle",
+  "□": "square",
+  "◇": "diamond-outline",
+  "▽": "triangle-down",
+  "✧": "sparkle",
+  "☆": "star",
+  "⬡": "hexagon",
+  "☐": "ballot",
+  "🎟": "ticket",
+  "ψ": "psi",
+  "☁": "cloud",
+  "⌒": "banana",
+  "@": "snail",
+  "€": "euro",
+  "$": "dollar",
+  "☽": "moon",
+};
+
 function EmojiDisplay({ emoji, className }: { emoji: string; className?: string }) {
-  if (CustomEmojiSvgs[emoji]) {
-    return <span className={className}>{CustomEmojiSvgs[emoji]}</span>;
+  // Check for legacy emoji and map to new key
+  const mappedKey = LegacyEmojiMap[emoji] || emoji;
+  if (CustomEmojiSvgs[mappedKey]) {
+    return <span className={className}>{CustomEmojiSvgs[mappedKey]}</span>;
   }
   return <span className={className}>{emoji}</span>;
 }
