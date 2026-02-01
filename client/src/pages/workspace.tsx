@@ -1086,17 +1086,62 @@ export default function WorkspacePage() {
     }
 
     const q = query.trim().toLowerCase();
-    if (!q) return result;
-    return result.filter((t) => {
-      const p = projects.find((x) => x.id === t.projectId)?.name ?? "";
-      return (
-        t.title.toLowerCase().includes(q) ||
-        statusLabel[t.status as Status]?.toLowerCase().includes(q) ||
-        t.priority.toLowerCase().includes(q) ||
-        p.toLowerCase().includes(q)
-      );
+    if (q) {
+      result = result.filter((t) => {
+        const p = projects.find((x) => x.id === t.projectId)?.name ?? "";
+        return (
+          t.title.toLowerCase().includes(q) ||
+          statusLabel[t.status as Status]?.toLowerCase().includes(q) ||
+          t.priority.toLowerCase().includes(q) ||
+          p.toLowerCase().includes(q)
+        );
+      });
+    }
+    return result.sort((a, b) => {
+      if (!a.due && !b.due) return 0;
+      if (!a.due) return 1;
+      if (!b.due) return -1;
+      return new Date(a.due).getTime() - new Date(b.due).getTime();
     });
   }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects, filters]);
+
+  const sortedEvents = useMemo(() => {
+    return [...events].sort((a, b) => {
+      return new Date(a.start).getTime() - new Date(b.start).getTime();
+    });
+  }, [events]);
+
+  const sortedProjects = useMemo(() => {
+    const projectLastActivity = new Map<string, Date>();
+    tasks.forEach((t) => {
+      if (t.projectId && t.due) {
+        const current = projectLastActivity.get(t.projectId);
+        const taskDate = new Date(t.due);
+        if (!current || taskDate > current) {
+          projectLastActivity.set(t.projectId, taskDate);
+        }
+      }
+    });
+    events.forEach((e) => {
+      const eventDate = new Date(e.start);
+      tasks.forEach((t) => {
+        if (t.projectId) {
+          const current = projectLastActivity.get(t.projectId);
+          if (!current || eventDate > current) {
+            projectLastActivity.set(t.projectId, eventDate);
+          }
+        }
+      });
+    });
+    return [...projects].sort((a, b) => {
+      const aDate = projectLastActivity.get(a.id);
+      const bDate = projectLastActivity.get(b.id);
+      if (!aDate && !bDate) return 0;
+      if (!aDate) return 1;
+      if (!bDate) return -1;
+      return bDate.getTime() - aDate.getTime();
+    });
+  }, [projects, tasks, events]);
 
   function onCreate() {
     setSelectedTask({
@@ -1143,7 +1188,7 @@ export default function WorkspacePage() {
         <LeftRail 
           active={active} 
           setActive={setActive} 
-          projects={projects} 
+          projects={sortedProjects} 
           tasks={tasks}
           selectedProject={selectedProject}
           onSelectProject={setSelectedProject}
@@ -1216,7 +1261,7 @@ export default function WorkspacePage() {
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
@@ -1274,10 +1319,10 @@ export default function WorkspacePage() {
                     month={month}
                     selected={selected}
                     onSelect={setSelected}
-                    events={events}
+                    events={sortedEvents}
                     tasks={tasks}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
