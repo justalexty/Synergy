@@ -107,7 +107,41 @@ function priorityClass(p: string) {
   }
 }
 
-const EMOJI_OPTIONS = ["✦", "◈", "◌", "◆", "△", "○", "□", "◇", "▽", "✧", "☆", "⬡", "☐", "🎟", "ψ", "☁", "⌒", "@", "€", "$", "☽"];
+const EMOJI_OPTIONS = ["✦", "◈", "◌", "◆", "△", "○", "□", "◇", "▽", "✧", "☆", "⬡", "ballot", "🎟", "ψ", "☁", "banana", "snail", "€", "$", "☽"];
+
+const CustomEmojiSvgs: Record<string, React.ReactNode> = {
+  ballot: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18" />
+      <path d="M12 5V3" />
+      <path d="M8 15l2 2 4-4" />
+    </svg>
+  ),
+  banana: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M5 17c0-5 4-10 12-10" />
+      <path d="M5 17c0 2 1 3 2.5 3s3.5-2 6-5c2.5-3 5.5-6 8.5-6" />
+      <path d="M17 7l1-2" />
+    </svg>
+  ),
+  snail: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <circle cx="12" cy="13" r="5" />
+      <path d="M12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+      <path d="M7 13c-2 0-4 1-4 3" />
+      <path d="M5 11l-1-2" />
+      <path d="M3 12l-1-1" />
+    </svg>
+  ),
+};
+
+function EmojiDisplay({ emoji, className }: { emoji: string; className?: string }) {
+  if (CustomEmojiSvgs[emoji]) {
+    return <span className={className}>{CustomEmojiSvgs[emoji]}</span>;
+  }
+  return <span className={className}>{emoji}</span>;
+}
 
 function ProjectForm({
   project,
@@ -148,7 +182,7 @@ function ProjectForm({
               onClick={() => setEmoji(e)}
               data-testid={`button-emoji-${e}`}
             >
-              <span className="text-lg">{e}</span>
+              <EmojiDisplay emoji={e} className="text-lg" />
             </button>
           ))}
         </div>
@@ -580,9 +614,7 @@ function LeftRail({
                 className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border bg-card/70"
                 data-testid={`badge-project-${p.id}`}
               >
-                <span className="text-sm leading-none" aria-hidden>
-                  {p.emoji}
-                </span>
+                <EmojiDisplay emoji={p.emoji} className="text-sm leading-none" />
               </div>
               <div className="text-sm" data-testid={`text-project-${p.id}`}>
                 {p.name}
