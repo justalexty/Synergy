@@ -22,6 +22,7 @@ import {
 import {
   CalendarDays,
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -104,6 +105,67 @@ function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TeamPanel({ members }: { members: Member[] }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-xl border bg-card/70 shadow-soft overflow-hidden">
+      <button
+        className="flex w-full items-center justify-between gap-2 px-3 py-2 hover:bg-card/90 transition-colors"
+        onClick={() => setExpanded(!expanded)}
+        data-testid="button-team-toggle"
+      >
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <div className="text-sm" data-testid="text-team-name">
+            Studio Team
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex -space-x-2">
+            {members.slice(0, 4).map((m) => (
+              <div
+                key={m.id}
+                className={cn(
+                  "h-7 w-7 rounded-full border bg-gradient-to-br",
+                  m.color,
+                )}
+                title={m.name}
+                data-testid={`img-avatar-${m.id}`}
+              />
+            ))}
+          </div>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-muted-foreground transition-transform",
+              expanded && "rotate-180"
+            )}
+          />
+        </div>
+      </button>
+      {expanded && (
+        <div className="border-t px-3 py-2 space-y-1.5" data-testid="panel-team-members">
+          {members.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-card/80 transition-colors"
+              data-testid={`row-member-${m.id}`}
+            >
+              <div
+                className={cn(
+                  "h-6 w-6 rounded-full border bg-gradient-to-br",
+                  m.color,
+                )}
+              />
+              <div className="text-sm">{m.name}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TopBar({
   query,
   setQuery,
@@ -172,27 +234,7 @@ function TopBar({
           />
         </div>
 
-        <div className="flex items-center justify-between gap-2 rounded-xl border bg-card/70 px-3 py-2 shadow-soft">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <div className="text-sm" data-testid="text-team-name">
-              Studio Team
-            </div>
-          </div>
-          <div className="flex -space-x-2">
-            {members.slice(0, 4).map((m) => (
-              <div
-                key={m.id}
-                className={cn(
-                  "h-7 w-7 rounded-full border bg-gradient-to-br",
-                  m.color,
-                )}
-                title={m.name}
-                data-testid={`img-avatar-${m.id}`}
-              />
-            ))}
-          </div>
-        </div>
+        <TeamPanel members={members} />
       </div>
     </div>
   );
