@@ -84,7 +84,7 @@ export class DbStorage implements IStorage {
     const result = await db
       .select()
       .from(members)
-      .where(eq(members.walletAddress, walletAddress));
+      .where(eq(members.walletAddress, walletAddress.toLowerCase()));
     return result[0];
   }
 

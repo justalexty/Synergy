@@ -276,6 +276,8 @@ function TopBar({
   projects,
   filters,
   setFilters,
+  userName,
+  onLogout,
 }: {
   query: string;
   setQuery: (v: string) => void;
@@ -284,6 +286,8 @@ function TopBar({
   projects: Project[];
   filters: Filters;
   setFilters: (f: Filters) => void;
+  userName?: string | null;
+  onLogout?: () => void;
 }) {
   const hasActiveFilters = filters.status.length > 0 || filters.priority.length > 0 || filters.projectId || filters.assigneeId;
   const toggleStatus = (s: string) => {
@@ -1274,7 +1278,7 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
 
   return (
     <AppShell>
-      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} projects={projects} filters={filters} setFilters={setFilters} />
+      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} projects={projects} filters={filters} setFilters={setFilters} userName={userName} onLogout={onLogout} />
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
         <LeftRail 
           active={active} 
