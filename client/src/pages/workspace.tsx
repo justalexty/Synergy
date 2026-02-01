@@ -337,7 +337,7 @@ function TopBar({
                   <div className="text-sm font-medium">Filters</div>
                   {hasActiveFilters && (
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="h-auto px-2 py-1 text-xs">
-                      Clear all
+                      Clear All
                     </Button>
                   )}
                 </div>
