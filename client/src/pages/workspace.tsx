@@ -1100,6 +1100,36 @@ export default function WorkspacePage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label>Assignees</Label>
+                <div className="flex flex-wrap gap-2 rounded-md border p-2" data-testid="assignees-container">
+                  {members.map((m) => {
+                    const isSelected = selectedTask.assigneeIds.includes(m.id);
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          const newIds = isSelected
+                            ? selectedTask.assigneeIds.filter((id) => id !== m.id)
+                            : [...selectedTask.assigneeIds, m.id];
+                          setSelectedTask({ ...selectedTask, assigneeIds: newIds });
+                        }}
+                        className={cn(
+                          "flex items-center gap-1.5 rounded-full border px-2 py-1 text-sm transition-colors",
+                          isSelected
+                            ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]"
+                            : "border-border hover:bg-muted"
+                        )}
+                        data-testid={`button-assignee-${m.id}`}
+                      >
+                        <div className={cn("h-5 w-5 rounded-full border bg-gradient-to-br", m.color)} />
+                        {m.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <div className="flex justify-between gap-2 pt-2">
                 <Button
                   variant="destructive"
@@ -1126,6 +1156,7 @@ export default function WorkspacePage() {
                           status: selectedTask.status,
                           priority: selectedTask.priority,
                           projectId: selectedTask.projectId,
+                          assigneeIds: selectedTask.assigneeIds,
                         },
                       });
                       setSelectedTask(null);
@@ -1172,6 +1203,36 @@ export default function WorkspacePage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label>Attendees</Label>
+                <div className="flex flex-wrap gap-2 rounded-md border p-2" data-testid="attendees-container">
+                  {members.map((m) => {
+                    const isSelected = selectedEvent.attendeeIds.includes(m.id);
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          const newIds = isSelected
+                            ? selectedEvent.attendeeIds.filter((id) => id !== m.id)
+                            : [...selectedEvent.attendeeIds, m.id];
+                          setSelectedEvent({ ...selectedEvent, attendeeIds: newIds });
+                        }}
+                        className={cn(
+                          "flex items-center gap-1.5 rounded-full border px-2 py-1 text-sm transition-colors",
+                          isSelected
+                            ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.1)] text-[hsl(var(--primary))]"
+                            : "border-border hover:bg-muted"
+                        )}
+                        data-testid={`button-attendee-${m.id}`}
+                      >
+                        <div className={cn("h-5 w-5 rounded-full border bg-gradient-to-br", m.color)} />
+                        {m.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <div className="flex justify-between gap-2 pt-2">
                 <Button
                   variant="destructive"
@@ -1196,6 +1257,7 @@ export default function WorkspacePage() {
                         data: {
                           title: selectedEvent.title,
                           color: selectedEvent.color,
+                          attendeeIds: selectedEvent.attendeeIds,
                         },
                       });
                       setSelectedEvent(null);
