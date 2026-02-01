@@ -1142,6 +1142,26 @@ export default function WorkspacePage() {
     });
   }, [events]);
 
+  const filteredEvents = useMemo(() => {
+    let result = sortedEvents;
+    
+    if (selectedProject) {
+      // Events don't have projectId, so when filtering by project, show no events
+      result = [];
+    }
+
+    if (filters.assigneeId) {
+      result = result.filter((e) => e.attendeeIds.includes(filters.assigneeId!));
+    }
+
+    const q = query.trim().toLowerCase();
+    if (q) {
+      result = result.filter((e) => e.title.toLowerCase().includes(q));
+    }
+
+    return result;
+  }, [sortedEvents, selectedProject, filters.assigneeId, query]);
+
   const sortedProjects = useMemo(() => {
     const projectLastActivity = new Map<string, Date>();
     tasks.forEach((t) => {
@@ -1352,10 +1372,10 @@ export default function WorkspacePage() {
                     month={month}
                     selected={selected}
                     onSelect={setSelected}
-                    events={sortedEvents}
-                    tasks={tasks}
+                    events={filteredEvents}
+                    tasks={filteredTasks}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} projects={projects} membersMap={membersMap} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={() => addQuickTask(true)} />
+                  <DayAgenda selected={selected} tasks={filteredTasks} events={filteredEvents} projects={projects} membersMap={membersMap} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={() => addQuickTask(true)} />
                 </div>
               </div>
             ) : null}
