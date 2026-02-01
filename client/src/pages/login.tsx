@@ -136,9 +136,7 @@ export default function LoginPage({ onAuthenticated }: Props) {
           )}
         </div>
       </Card>
-      <div className="fixed bottom-4 text-center text-xs text-muted-foreground/50">
-        Wallet-gated access
-      </div>
+      <div className="fixed bottom-4 text-center text-xs text-muted-foreground/50">Someday Studios</div>
     </div>
   );
 }
