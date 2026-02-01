@@ -544,10 +544,10 @@ function LeftRail({
               onClick={() => onSelectProject(selectedProject === p.id ? null : p.id)}
             >
               <div
-                className="grid h-7 w-7 place-items-center rounded-lg border bg-card/70"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border bg-card/70"
                 data-testid={`badge-project-${p.id}`}
               >
-                <span className="text-sm" aria-hidden>
+                <span className="text-sm leading-none" aria-hidden>
                   {p.emoji}
                 </span>
               </div>
