@@ -1058,9 +1058,7 @@ export default function WorkspacePage() {
                   <Card className="glass shadow-soft rounded-2xl p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-sm font-medium" data-testid="text-recents-title">
-                          Recent tasks
-                        </div>
+                        <div className="text-sm font-medium" data-testid="text-recents-title">Recent Tasks</div>
                         <div className="text-xs text-muted-foreground" data-testid="text-recents-subtitle">
                           A quick pulse across the team
                         </div>
@@ -1490,7 +1488,6 @@ export default function WorkspacePage() {
           )}
         </DialogContent>
       </Dialog>
-
       <Dialog open={isAddingProject || !!editingProject} onOpenChange={(open) => {
         if (!open) {
           setIsAddingProject(false);
