@@ -121,14 +121,25 @@ export class DbStorage implements IStorage {
     }
 
     const alexWallet = "0xf391eee70a073e9ed53ebd3b9836644fdfe1b7c6";
-    const existingWallet = await this.getApprovedWallet(alexWallet);
-    if (!existingWallet) {
+    const existingAlexWallet = await this.getApprovedWallet(alexWallet);
+    if (!existingAlexWallet) {
       console.log("[storage] Seeding approved wallet for Alex...");
       await this.createApprovedWallet({
         walletAddress: alexWallet,
         userName: "Alex",
       });
-      console.log("[storage] Approved wallet seeded successfully");
+      console.log("[storage] Approved wallet for Alex seeded successfully");
+    }
+
+    const josephWallet = "0xE701998A8Fe6523b053DF9D9a2e300F7bb27E320";
+    const existingJosephWallet = await this.getApprovedWallet(josephWallet);
+    if (!existingJosephWallet) {
+      console.log("[storage] Seeding approved wallet for Joseph...");
+      await this.createApprovedWallet({
+        walletAddress: josephWallet,
+        userName: "Joseph",
+      });
+      console.log("[storage] Approved wallet for Joseph seeded successfully");
     }
   }
 
