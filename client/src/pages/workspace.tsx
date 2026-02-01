@@ -935,16 +935,25 @@ function MonthGrid({
   }, [events, tasks]);
 
   return (
-    <div className="rounded-2xl border bg-card/70 p-3 shadow-soft">
-      <div className="grid grid-cols-7 gap-2 pb-2 text-xs text-muted-foreground">
-        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((x) => (
-          <div key={x} className="px-2" data-testid={`text-weekday-${x}`}>
-            {x}
+    <div className="rounded-2xl border bg-card/70 p-2 shadow-soft sm:p-3">
+      <div className="grid grid-cols-7 gap-1 pb-2 text-center text-[10px] text-muted-foreground sm:gap-2 sm:text-xs">
+        {[
+          { short: "M", full: "Mon" },
+          { short: "T", full: "Tue" },
+          { short: "W", full: "Wed" },
+          { short: "T", full: "Thu" },
+          { short: "F", full: "Fri" },
+          { short: "S", full: "Sat" },
+          { short: "S", full: "Sun" },
+        ].map((x, i) => (
+          <div key={i} className="px-1 sm:px-2" data-testid={`text-weekday-${x.full}`}>
+            <span className="sm:hidden">{x.short}</span>
+            <span className="hidden sm:inline">{x.full}</span>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const dayItems = byDay.get(key) ?? [];
@@ -957,7 +966,7 @@ function MonthGrid({
               type="button"
               onClick={() => onSelect(day)}
               className={cn(
-                "group relative flex min-h-[88px] flex-col rounded-xl border px-2 py-2 text-left transition",
+                "group relative flex min-h-[48px] flex-col rounded-lg border px-1 py-1 text-left transition sm:min-h-[88px] sm:rounded-xl sm:px-2 sm:py-2",
                 "hover:-translate-y-[1px] hover:shadow-float",
                 inMonth ? "bg-card/60" : "bg-card/30 opacity-70",
                 isSel ? "border-[hsl(var(--primary)/0.45)] bg-[hsl(var(--primary)/0.08)]" : "border-border",
@@ -967,8 +976,8 @@ function MonthGrid({
               <div className="flex items-center justify-between">
                 <div
                   className={cn(
-                    "text-xs",
-                    isToday(day) ? "text-[hsl(var(--primary))]" : "text-muted-foreground",
+                    "text-[10px] sm:text-xs",
+                    isToday(day) ? "text-[hsl(var(--primary))] font-semibold" : "text-muted-foreground",
                   )}
                   data-testid={`text-daynum-${key}`}
                 >
@@ -982,7 +991,7 @@ function MonthGrid({
                 ) : null}
               </div>
 
-              <div className="mt-2 flex flex-col gap-1">
+              <div className="mt-1 hidden flex-col gap-1 sm:mt-2 sm:flex">
                 {dayItems.slice(0, 2).map((item) => (
                   <div
                     key={item.id}
@@ -1003,6 +1012,25 @@ function MonthGrid({
                   </div>
                 ) : null}
               </div>
+
+              {dayItems.length > 0 ? (
+                <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden">
+                  {dayItems.slice(0, 3).map((item) => (
+                    <div
+                      key={item.id}
+                      className={cn(
+                        "h-1 w-1 rounded-full",
+                        item.type === "task"
+                          ? "bg-[hsl(355_45%_65%)]"
+                          : "bg-[hsl(var(--primary))]",
+                      )}
+                    />
+                  ))}
+                  {dayItems.length > 3 ? (
+                    <div className="h-1 w-1 rounded-full bg-muted-foreground/50" />
+                  ) : null}
+                </div>
+              ) : null}
             </button>
           );
         })}
@@ -1521,18 +1549,19 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
 
             {active === "calendar" ? (
               <div className="space-y-4">
-                <div className="flex flex-col gap-3 rounded-2xl border bg-card/70 p-4 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 rounded-2xl border bg-card/70 p-3 shadow-soft sm:p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <div className="font-display text-2xl font-[720] tracking-[-0.03em]" data-testid="text-calendar-title">
+                    <div className="font-display text-xl font-[720] tracking-[-0.03em] sm:text-2xl" data-testid="text-calendar-title">
                       {format(month, "MMMM yyyy")}
                     </div>
-                    <div className="text-xs text-muted-foreground" data-testid="text-calendar-subtitle">Click a day to see agenda.</div>
+                    <div className="text-xs text-muted-foreground hidden sm:block" data-testid="text-calendar-subtitle">Click a day to see agenda.</div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <Button
                       variant="secondary"
                       size="icon"
+                      className="h-8 w-8 sm:h-9 sm:w-9"
                       onClick={() => setMonth((m) => subMonths(m, 1))}
                       data-testid="button-prev-month"
                     >
@@ -1541,6 +1570,7 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
                     <Button
                       variant="secondary"
                       size="icon"
+                      className="h-8 w-8 sm:h-9 sm:w-9"
                       onClick={() => setMonth((m) => addMonths(m, 1))}
                       data-testid="button-next-month"
                     >
@@ -1548,6 +1578,7 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
                     </Button>
                     <Button
                       variant="secondary"
+                      className="h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm"
                       onClick={() => {
                         setMonth(new Date());
                         setSelected(new Date());
@@ -1557,12 +1588,13 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
                       Today
                     </Button>
                     <Button
-                      className="shadow-soft"
+                      className="shadow-soft h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm"
                       onClick={() => addQuickEvent(true)}
                       data-testid="button-add-event"
                     >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Meeting
+                      <Plus className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Meeting</span>
+                      <span className="sm:hidden">Event</span>
                     </Button>
                   </div>
                 </div>
