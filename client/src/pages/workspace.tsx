@@ -601,12 +601,14 @@ function DayAgenda({
   events,
   onTaskClick,
   onEventClick,
+  onAddTask,
 }: { 
   selected: Date; 
   tasks: Task[]; 
   events: Event[];
   onTaskClick?: (t: Task) => void;
   onEventClick?: (e: Event) => void;
+  onAddTask?: () => void;
 }) {
   const tasksForDay = tasks
     .filter((t) => t.due && isSameDay(t.due, selected))
@@ -627,9 +629,9 @@ function DayAgenda({
             {format(selected, "EEEE, MMM d")}
           </div>
         </div>
-        <Button size="sm" variant="secondary" data-testid="button-add-agenda">
+        <Button size="sm" variant="secondary" onClick={onAddTask} data-testid="button-add-agenda">
           <Plus className="mr-2 h-4 w-4" />
-          Add
+          Add Task
         </Button>
       </div>
 
@@ -917,7 +919,7 @@ export default function WorkspacePage() {
                           A quick pulse across the team
                         </div>
                       </div>
-                      <Button variant="secondary" size="sm" data-testid="button-viewall">View All</Button>
+                      <Button variant="secondary" size="sm" onClick={() => setActive("tasks")} data-testid="button-viewall">View All</Button>
                     </div>
                     <Separator className="my-3" />
                     <div className="space-y-2">
@@ -927,7 +929,7 @@ export default function WorkspacePage() {
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} />
+                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
@@ -990,7 +992,7 @@ export default function WorkspacePage() {
                     events={events}
                     tasks={tasks}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} />
+                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
