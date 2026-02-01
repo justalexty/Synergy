@@ -401,7 +401,7 @@ function TaskRow({
         </div>
 
         <div
-          className="mt-2 truncate text-sm font-medium pl-2"
+          className="mt-2 truncate text-sm font-medium pl-0.5"
           data-testid={`text-tasktitle-${t.id}`}
         >
           {t.title}
