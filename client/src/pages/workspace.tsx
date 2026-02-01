@@ -28,10 +28,12 @@ import {
   Filter,
   Handshake,
   LayoutGrid,
+  LogOut,
   Pencil,
   Plus,
   Search,
   Trash2,
+  User,
   Users,
   X,
 } from "lucide-react";
@@ -59,6 +61,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import WalletConnectButton from "@/components/walletconnect-button";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -315,7 +325,26 @@ function TopBar({
         </div>
 
         <div className="flex items-center gap-2">
-          <WalletConnectButton onConnected={() => {}} />
+          {userName && onLogout ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" className="gap-2" data-testid="button-user-menu">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">{userName}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>{userName}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onLogout} data-testid="button-logout">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <WalletConnectButton onConnected={() => {}} />
+          )}
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -946,7 +975,12 @@ function DayAgenda({
   );
 }
 
-export default function WorkspacePage() {
+type WorkspaceProps = {
+  userName?: string | null;
+  onLogout?: () => void;
+};
+
+export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
   const queryClient = useQueryClient();
   const [active, setActive] = useState<"overview" | "calendar" | "tasks">(
     "overview",
