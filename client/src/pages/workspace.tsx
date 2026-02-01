@@ -1149,12 +1149,12 @@ export default function WorkspacePage() {
     setSelectedTask({
       id: "__new__",
       title: "",
-      status: "todo",
+      status: "",
       projectId: null,
       assigneeIds: [],
       due: null,
-      priority: "Medium",
-    });
+      priority: "",
+    } as Task);
     setIsNewTask(true);
   }
 
@@ -1176,12 +1176,12 @@ export default function WorkspacePage() {
     setSelectedTask({
       id: "__new__",
       title: "",
-      status: "todo",
+      status: "",
       projectId: null,
       assigneeIds: [],
       due: fromCalendar ? selected : null,
-      priority: "Medium",
-    });
+      priority: "",
+    } as Task);
     setIsNewTask(true);
   }
 
