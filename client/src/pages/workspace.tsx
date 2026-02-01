@@ -24,7 +24,6 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Handshake,
   LayoutGrid,
   Pencil,
@@ -288,14 +287,6 @@ function TopBar({
 
         <div className="flex items-center gap-2">
           <WalletConnectButton onConnected={() => {}} />
-          <Button
-            variant="secondary"
-            className="hidden sm:inline-flex"
-            data-testid="button-filter"
-          >
-            <Filter className="mr-2 h-4 w-4" />
-            Filters
-          </Button>
           <Button
             className="shadow-soft neon-ring"
             onClick={onCreate}
