@@ -1316,7 +1316,7 @@ export default function WorkspacePage() {
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} projects={projects} membersMap={membersMap} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={() => addQuickTask(true)} />
+                  <DayAgenda selected={now} tasks={tasks} events={sortedEvents} projects={projects} membersMap={membersMap} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={() => addQuickTask(false)} />
                 </div>
               </div>
             ) : null}
