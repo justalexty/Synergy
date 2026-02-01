@@ -99,6 +99,11 @@ export async function registerRoutes(
     }
   });
 
+  app.delete("/api/projects/:id", async (req, res) => {
+    await storage.deleteProject(req.params.id);
+    res.status(204).send();
+  });
+
   // Tasks
   app.get("/api/tasks", async (_req, res) => {
     const tasks = await storage.getTasks();

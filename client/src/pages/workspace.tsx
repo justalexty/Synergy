@@ -27,6 +27,7 @@ import {
   Filter,
   Handshake,
   LayoutGrid,
+  Pencil,
   Plus,
   Search,
   Trash2,
@@ -93,6 +94,80 @@ function priorityClass(p: string) {
     case "High":
       return "bg-[hsl(355_45%_95%)] text-[#ff7d8f] border-[hsl(354_35%_85%)]";
   }
+}
+
+const EMOJI_OPTIONS = ["🚀", "📊", "🎨", "💼", "🔧", "📝", "🌟", "🎯", "📦", "🔥", "💡", "🌈"];
+
+function ProjectForm({
+  project,
+  onSave,
+  onDelete,
+  onCancel,
+}: {
+  project: Project | null;
+  onSave: (data: Partial<Project>) => void;
+  onDelete?: () => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState(project?.name || "");
+  const [emoji, setEmoji] = useState(project?.emoji || "🚀");
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Project Name</Label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter project name"
+          data-testid="input-project-name"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Emoji</Label>
+        <div className="flex flex-wrap gap-2">
+          {EMOJI_OPTIONS.map((e) => (
+            <button
+              key={e}
+              type="button"
+              className={cn(
+                "grid h-10 w-10 place-items-center rounded-lg border transition-colors",
+                emoji === e ? "bg-primary/10 border-primary" : "hover:bg-muted"
+              )}
+              onClick={() => setEmoji(e)}
+              data-testid={`button-emoji-${e}`}
+            >
+              <span className="text-lg">{e}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex justify-between pt-4">
+        {onDelete && (
+          <Button
+            variant="destructive"
+            onClick={onDelete}
+            data-testid="button-delete-project"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </Button>
+        )}
+        <div className="flex gap-2 ml-auto">
+          <Button variant="outline" onClick={onCancel} data-testid="button-cancel-project">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => onSave({ name, emoji })}
+            disabled={!name.trim()}
+            data-testid="button-save-project"
+          >
+            {project ? "Save" : "Create"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
@@ -256,6 +331,8 @@ function LeftRail({
   tasks,
   selectedProject,
   onSelectProject,
+  onEditProject,
+  onAddProject,
 }: {
   active: "overview" | "calendar" | "tasks";
   setActive: (v: "overview" | "calendar" | "tasks") => void;
@@ -263,6 +340,8 @@ function LeftRail({
   tasks: Task[];
   selectedProject: string | null;
   onSelectProject: (id: string | null) => void;
+  onEditProject: (project: Project) => void;
+  onAddProject: () => void;
 }) {
   const taskCountByProject = useMemo(() => {
     const counts = new Map<string, number>();
@@ -321,21 +400,32 @@ function LeftRail({
 
       <Separator className="my-3" />
 
-      <div className="px-2">
+      <div className="flex items-center justify-between px-2">
         <div className="text-xs font-medium text-muted-foreground">Projects</div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-6 w-6" 
+          onClick={onAddProject}
+          data-testid="button-add-project"
+        >
+          <Plus className="h-3 w-3" />
+        </Button>
       </div>
       <div className="mt-2 flex flex-col gap-1">
         {projects.map((p) => (
-          <button
+          <div
             key={p.id}
             className={cn(
-              "flex w-full items-center justify-between rounded-xl px-2 py-2 text-left transition-colors hover:bg-[hsl(var(--foreground)/0.05)]",
+              "group flex w-full items-center justify-between rounded-xl px-2 py-2 text-left transition-colors hover:bg-[hsl(var(--foreground)/0.05)]",
               selectedProject === p.id && "bg-primary/10 ring-1 ring-primary/30"
             )}
-            onClick={() => onSelectProject(selectedProject === p.id ? null : p.id)}
             data-testid={`row-project-${p.id}`}
           >
-            <div className="flex items-center gap-2">
+            <button
+              className="flex flex-1 items-center gap-2"
+              onClick={() => onSelectProject(selectedProject === p.id ? null : p.id)}
+            >
               <div
                 className="grid h-7 w-7 place-items-center rounded-lg border bg-card/70"
                 data-testid={`badge-project-${p.id}`}
@@ -347,11 +437,25 @@ function LeftRail({
               <div className="text-sm" data-testid={`text-project-${p.id}`}>
                 {p.name}
               </div>
+            </button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditProject(p);
+                }}
+                data-testid={`button-edit-project-${p.id}`}
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+              <Badge variant="secondary" data-testid={`badge-count-${p.id}`}>
+                {taskCountByProject.get(p.id) || 0}
+              </Badge>
             </div>
-            <Badge variant="secondary" data-testid={`badge-count-${p.id}`}>
-              {taskCountByProject.get(p.id) || 0}
-            </Badge>
-          </button>
+          </div>
         ))}
       </div>
     </div>
@@ -707,6 +811,8 @@ export default function WorkspacePage() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isAddingProject, setIsAddingProject] = useState(false);
   const [metricFilter, setMetricFilter] = useState<"week" | "progress" | "focus" | null>(null);
 
   const { data: members = [] } = useQuery({
@@ -772,6 +878,33 @@ export default function WorkspacePage() {
     mutationFn: (id: string) => api.events.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+
+  const createProjectMutation = useMutation({
+    mutationFn: api.projects.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setIsAddingProject(false);
+    },
+  });
+
+  const updateProjectMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Project> }) =>
+      api.projects.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setEditingProject(null);
+    },
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: (id: string) => api.projects.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      setEditingProject(null);
+      if (selectedProject === id) setSelectedProject(null);
     },
   });
 
@@ -871,6 +1004,8 @@ export default function WorkspacePage() {
           tasks={tasks}
           selectedProject={selectedProject}
           onSelectProject={setSelectedProject}
+          onEditProject={setEditingProject}
+          onAddProject={() => setIsAddingProject(true)}
         />
 
         <div className="min-w-0">
@@ -1353,6 +1488,34 @@ export default function WorkspacePage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAddingProject || !!editingProject} onOpenChange={(open) => {
+        if (!open) {
+          setIsAddingProject(false);
+          setEditingProject(null);
+        }
+      }}>
+        <DialogContent className="sm:max-w-md glass">
+          <DialogHeader>
+            <DialogTitle>{editingProject ? "Edit Project" : "Add Project"}</DialogTitle>
+          </DialogHeader>
+          <ProjectForm
+            project={editingProject}
+            onSave={(data) => {
+              if (editingProject) {
+                updateProjectMutation.mutate({ id: editingProject.id, data });
+              } else {
+                createProjectMutation.mutate(data as any);
+              }
+            }}
+            onDelete={editingProject ? () => deleteProjectMutation.mutate(editingProject.id) : undefined}
+            onCancel={() => {
+              setIsAddingProject(false);
+              setEditingProject(null);
+            }}
+          />
         </DialogContent>
       </Dialog>
     </AppShell>
