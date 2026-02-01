@@ -849,6 +849,19 @@ export default function WorkspacePage() {
     });
   }
 
+  function addQuickTask() {
+    if (projects.length === 0 || members.length === 0) return;
+    
+    createTaskMutation.mutate({
+      title: "New task",
+      status: "todo",
+      projectId: projects[0].id,
+      assigneeIds: [members[0].id],
+      due: selected,
+      priority: "Medium",
+    });
+  }
+
   return (
     <AppShell>
       <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} />
