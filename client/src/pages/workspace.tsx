@@ -1531,25 +1531,6 @@ export default function WorkspacePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-event-date">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedEvent.start ? format(new Date(selectedEvent.start), "PPP") : ""}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedEvent.start ? new Date(selectedEvent.start) : undefined}
-                      onSelect={(date) => date && setSelectedEvent({ ...selectedEvent, start: date })}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
                 <Label>Attendees</Label>
                 <div className="flex flex-wrap gap-2" data-testid="attendees-container">
                   {selectedEvent.attendeeIds.map((id) => {
@@ -1603,6 +1584,25 @@ export default function WorkspacePage() {
                       ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-event-date">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedEvent.start ? new Date(selectedEvent.start) : undefined}
+                      onSelect={(date) => date && setSelectedEvent({ ...selectedEvent, start: date })}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="flex justify-between gap-2 pt-2">
                 <Button
