@@ -83,7 +83,7 @@ function statusClass(s: Status) {
 function priorityClass(p: string) {
   switch (p) {
     case "Low":
-      return "bg-[hsl(255_40%_92%)] text-[hsl(260_45%_38%)] border-[hsl(255_35%_78%)]";
+      return "bg-[hsl(285_35%_88%)] text-[hsl(290_45%_32%)] border-[hsl(285_30%_72%)]";
     case "Medium":
       return "bg-[hsl(45_80%_90%)] text-[hsl(40_70%_35%)] border-[hsl(42_65%_75%)]";
     case "High":
