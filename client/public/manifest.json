@@ -1,0 +1,24 @@
+{
+  "name": "Synergy",
+  "short_name": "Synergy",
+  "description": "A team workflow + calendar workspace: plan projects, assign tasks, and coordinate schedules in one place.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1614",
+  "theme_color": "#851d52",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
