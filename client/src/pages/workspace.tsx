@@ -139,9 +139,7 @@ function TopBar({
               <div
                 className="font-retro text-[11px] text-muted-foreground uppercase tracking-wide"
                 data-testid="text-app-subtitle"
-              >
-                ~ workflow terminal v2.0 ~
-              </div>
+              >workflow terminal</div>
             </div>
           </div>
         </div>
@@ -166,7 +164,6 @@ function TopBar({
           </Button>
         </div>
       </div>
-
       <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto]">
         <div className="glass shadow-soft flex items-center gap-2 rounded-xl px-3 py-2">
           <Search className="h-4 w-4 text-muted-foreground" />
