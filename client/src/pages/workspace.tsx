@@ -731,15 +731,17 @@ export default function WorkspacePage() {
 
   const createTaskMutation = useMutation({
     mutationFn: api.tasks.create,
-    onSuccess: () => {
+    onSuccess: (newTask) => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      setSelectedTask(newTask);
     },
   });
 
   const createEventMutation = useMutation({
     mutationFn: api.events.create,
-    onSuccess: () => {
+    onSuccess: (newEvent) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      setSelectedEvent(newEvent);
     },
   });
 
