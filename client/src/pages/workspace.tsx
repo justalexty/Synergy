@@ -96,7 +96,7 @@ function priorityClass(p: string) {
   }
 }
 
-const EMOJI_OPTIONS = ["🚀", "📊", "🎨", "💼", "🔧", "📝", "🌟", "🎯", "📦", "🔥", "💡", "🌈"];
+const EMOJI_OPTIONS = ["✦", "◈", "◌", "◆", "△", "○", "□", "◇", "▽", "✧", "☆", "⬡"];
 
 function ProjectForm({
   project,
