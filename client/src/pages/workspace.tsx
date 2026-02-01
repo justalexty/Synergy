@@ -29,6 +29,7 @@ import {
   LayoutGrid,
   Plus,
   Search,
+  Trash2,
   Users,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -749,6 +750,20 @@ export default function WorkspacePage() {
     },
   });
 
+  const deleteTaskMutation = useMutation({
+    mutationFn: (id: string) => api.tasks.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  const deleteEventMutation = useMutation({
+    mutationFn: (id: string) => api.events.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+
   const membersMap = useMemo(() => {
     return new Map(members.map((m) => [m.id, m] as const));
   }, [members]);
@@ -1085,27 +1100,41 @@ export default function WorkspacePage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="secondary" onClick={() => setSelectedTask(null)} data-testid="button-cancel-task">
-                  Cancel
-                </Button>
+              <div className="flex justify-between gap-2 pt-2">
                 <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={() => {
-                    updateTaskMutation.mutate({
-                      id: selectedTask.id,
-                      data: {
-                        title: selectedTask.title,
-                        status: selectedTask.status,
-                        priority: selectedTask.priority,
-                        projectId: selectedTask.projectId,
-                      },
-                    });
+                    deleteTaskMutation.mutate(selectedTask.id);
                     setSelectedTask(null);
                   }}
-                  data-testid="button-save-task"
+                  data-testid="button-delete-task"
                 >
-                  Save Changes
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
                 </Button>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={() => setSelectedTask(null)} data-testid="button-cancel-task">
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      updateTaskMutation.mutate({
+                        id: selectedTask.id,
+                        data: {
+                          title: selectedTask.title,
+                          status: selectedTask.status,
+                          priority: selectedTask.priority,
+                          projectId: selectedTask.projectId,
+                        },
+                      });
+                      setSelectedTask(null);
+                    }}
+                    data-testid="button-save-task"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -1143,25 +1172,39 @@ export default function WorkspacePage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="secondary" onClick={() => setSelectedEvent(null)} data-testid="button-cancel-event">
-                  Cancel
-                </Button>
+              <div className="flex justify-between gap-2 pt-2">
                 <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={() => {
-                    updateEventMutation.mutate({
-                      id: selectedEvent.id,
-                      data: {
-                        title: selectedEvent.title,
-                        color: selectedEvent.color,
-                      },
-                    });
+                    deleteEventMutation.mutate(selectedEvent.id);
                     setSelectedEvent(null);
                   }}
-                  data-testid="button-save-event"
+                  data-testid="button-delete-event"
                 >
-                  Save Changes
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
                 </Button>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={() => setSelectedEvent(null)} data-testid="button-cancel-event">
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      updateEventMutation.mutate({
+                        id: selectedEvent.id,
+                        data: {
+                          title: selectedEvent.title,
+                          color: selectedEvent.color,
+                        },
+                      });
+                      setSelectedEvent(null);
+                    }}
+                    data-testid="button-save-event"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
               </div>
             </div>
           )}
