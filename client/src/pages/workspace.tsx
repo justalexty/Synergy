@@ -63,24 +63,24 @@ const statusLabel: Record<Status, string> = {
 function statusClass(s: Status) {
   switch (s) {
     case "todo":
-      return "bg-muted text-muted-foreground border-border";
+      return "bg-[hsl(35_20%_88%)] text-[hsl(25_30%_40%)] border-[hsl(30_20%_75%)]";
     case "in_progress":
-      return "bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))] border-[hsl(var(--primary)/0.25)]";
+      return "bg-[hsl(16_85%_94%)] text-[hsl(16_75%_42%)] border-[hsl(16_70%_80%)]";
     case "blocked":
-      return "bg-[hsl(var(--destructive)/0.10)] text-[hsl(var(--destructive))] border-[hsl(var(--destructive)/0.25)]";
+      return "bg-[hsl(355_60%_92%)] text-[hsl(355_55%_45%)] border-[hsl(355_50%_78%)]";
     case "done":
-      return "bg-[hsl(var(--accent)/0.14)] text-[hsl(var(--accent))] border-[hsl(var(--accent)/0.25)]";
+      return "bg-[hsl(145_40%_90%)] text-[hsl(150_45%_35%)] border-[hsl(145_35%_75%)]";
   }
 }
 
 function priorityClass(p: string) {
   switch (p) {
     case "Low":
-      return "bg-muted text-muted-foreground border-border";
+      return "bg-[hsl(35_20%_88%)] text-[hsl(25_30%_40%)] border-[hsl(30_20%_75%)]";
     case "Medium":
-      return "bg-[hsl(var(--chart-4)/0.18)] text-[hsl(var(--chart-4))] border-[hsl(var(--chart-4)/0.30)]";
+      return "bg-[hsl(45_80%_90%)] text-[hsl(40_70%_35%)] border-[hsl(42_65%_75%)]";
     case "High":
-      return "bg-[hsl(var(--destructive)/0.10)] text-[hsl(var(--destructive))] border-[hsl(var(--destructive)/0.25)]";
+      return "bg-[hsl(355_60%_92%)] text-[hsl(355_55%_45%)] border-[hsl(355_50%_78%)]";
   }
 }
 
