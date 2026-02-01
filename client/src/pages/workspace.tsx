@@ -315,6 +315,108 @@ function TopBar({
 
         <div className="flex items-center gap-2">
           <WalletConnectButton onConnected={() => {}} />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={hasActiveFilters ? "default" : "secondary"}
+                className="hidden sm:inline-flex"
+                data-testid="button-filter"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Filters
+                {hasActiveFilters && (
+                  <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+                    {filters.status.length + filters.priority.length + (filters.projectId ? 1 : 0) + (filters.assigneeId ? 1 : 0)}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72" align="end">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium">Filters</div>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-auto px-2 py-1 text-xs">
+                      Clear all
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Status</Label>
+                  <div className="flex flex-wrap gap-1">
+                    {(["todo", "in_progress", "blocked", "done"] as const).map((s) => (
+                      <Button
+                        key={s}
+                        variant={filters.status.includes(s) ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => toggleStatus(s)}
+                        data-testid={`filter-status-${s}`}
+                      >
+                        {statusLabel[s]}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Priority</Label>
+                  <div className="flex flex-wrap gap-1">
+                    {["High", "Medium", "Low"].map((p) => (
+                      <Button
+                        key={p}
+                        variant={filters.priority.includes(p) ? "default" : "outline"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => togglePriority(p)}
+                        data-testid={`filter-priority-${p}`}
+                      >
+                        {p}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Project</Label>
+                  <Select
+                    value={filters.projectId ?? ""}
+                    onValueChange={(v) => setFilters({ ...filters, projectId: v || null })}
+                  >
+                    <SelectTrigger className="h-8" data-testid="filter-project">
+                      <SelectValue placeholder="Any project" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any project</SelectItem>
+                      {projects.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Assignee</Label>
+                  <Select
+                    value={filters.assigneeId ?? ""}
+                    onValueChange={(v) => setFilters({ ...filters, assigneeId: v || null })}
+                  >
+                    <SelectTrigger className="h-8" data-testid="filter-assignee">
+                      <SelectValue placeholder="Anyone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Anyone</SelectItem>
+                      {members.map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          <div className="flex items-center gap-2">
+                            <div className={cn("h-4 w-4 rounded-full border bg-gradient-to-br", m.color)} />
+                            {m.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button
             className="shadow-soft neon-ring"
             onClick={onCreate}
@@ -337,108 +439,6 @@ function TopBar({
           />
         </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={hasActiveFilters ? "default" : "secondary"}
-              className="hidden sm:inline-flex"
-              data-testid="button-filter"
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Filters
-              {hasActiveFilters && (
-                <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-                  {filters.status.length + filters.priority.length + (filters.projectId ? 1 : 0) + (filters.assigneeId ? 1 : 0)}
-                </Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-72" align="end">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">Filters</div>
-                {hasActiveFilters && (
-                  <Button variant="ghost" size="sm" onClick={clearFilters} className="h-auto px-2 py-1 text-xs">
-                    Clear all
-                  </Button>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Status</Label>
-                <div className="flex flex-wrap gap-1">
-                  {(["todo", "in_progress", "blocked", "done"] as const).map((s) => (
-                    <Button
-                      key={s}
-                      variant={filters.status.includes(s) ? "default" : "outline"}
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => toggleStatus(s)}
-                      data-testid={`filter-status-${s}`}
-                    >
-                      {statusLabel[s]}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Priority</Label>
-                <div className="flex flex-wrap gap-1">
-                  {["High", "Medium", "Low"].map((p) => (
-                    <Button
-                      key={p}
-                      variant={filters.priority.includes(p) ? "default" : "outline"}
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => togglePriority(p)}
-                      data-testid={`filter-priority-${p}`}
-                    >
-                      {p}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Project</Label>
-                <Select
-                  value={filters.projectId ?? ""}
-                  onValueChange={(v) => setFilters({ ...filters, projectId: v || null })}
-                >
-                  <SelectTrigger className="h-8" data-testid="filter-project">
-                    <SelectValue placeholder="Any project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any project</SelectItem>
-                    {projects.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Assignee</Label>
-                <Select
-                  value={filters.assigneeId ?? ""}
-                  onValueChange={(v) => setFilters({ ...filters, assigneeId: v || null })}
-                >
-                  <SelectTrigger className="h-8" data-testid="filter-assignee">
-                    <SelectValue placeholder="Anyone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Anyone</SelectItem>
-                    {members.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>
-                        <div className="flex items-center gap-2">
-                          <div className={cn("h-4 w-4 rounded-full border bg-gradient-to-br", m.color)} />
-                          {m.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
         <TeamPanel members={members} />
       </div>
     </div>
