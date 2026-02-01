@@ -22,7 +22,6 @@ import {
 import {
   CalendarDays,
   CheckCircle2,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -106,13 +105,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
 }
 
 function TeamPanel({ members }: { members: Member[] }) {
-  const [expanded, setExpanded] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-xl border bg-card/70 shadow-soft overflow-hidden">
+    <div className="relative">
       <button
-        className="flex w-full items-center justify-between gap-2 px-3 py-2 hover:bg-card/90 transition-colors"
-        onClick={() => setExpanded(!expanded)}
+        className="flex items-center justify-between gap-2 rounded-xl border bg-card/70 px-3 py-2 shadow-soft hover:bg-card/90 transition-colors"
+        onClick={() => setOpen(!open)}
         data-testid="button-team-toggle"
       >
         <div className="flex items-center gap-2">
@@ -121,46 +120,52 @@ function TeamPanel({ members }: { members: Member[] }) {
             Studio Team
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex -space-x-2">
-            {members.slice(0, 4).map((m) => (
-              <div
-                key={m.id}
-                className={cn(
-                  "h-7 w-7 rounded-full border bg-gradient-to-br",
-                  m.color,
-                )}
-                title={m.name}
-                data-testid={`img-avatar-${m.id}`}
-              />
-            ))}
-          </div>
-          <ChevronDown
-            className={cn(
-              "h-4 w-4 text-muted-foreground transition-transform",
-              expanded && "rotate-180"
-            )}
-          />
-        </div>
-      </button>
-      {expanded && (
-        <div className="border-t px-3 py-2 space-y-1.5" data-testid="panel-team-members">
-          {members.map((m) => (
+        <div className="flex -space-x-2">
+          {members.slice(0, 4).map((m) => (
             <div
               key={m.id}
-              className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-card/80 transition-colors"
-              data-testid={`row-member-${m.id}`}
-            >
-              <div
-                className={cn(
-                  "h-6 w-6 rounded-full border bg-gradient-to-br",
-                  m.color,
-                )}
-              />
-              <div className="text-sm">{m.name}</div>
-            </div>
+              className={cn(
+                "h-7 w-7 rounded-full border bg-gradient-to-br",
+                m.color,
+              )}
+              title={m.name}
+              data-testid={`img-avatar-${m.id}`}
+            />
           ))}
         </div>
+      </button>
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border bg-card/95 backdrop-blur-sm p-2 shadow-float animate-in fade-in-0 zoom-in-95"
+            data-testid="panel-team-members"
+          >
+            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+              Team Members
+            </div>
+            <div className="space-y-0.5">
+              {members.map((m) => (
+                <div
+                  key={m.id}
+                  className="flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-card/80 transition-colors cursor-pointer"
+                  data-testid={`row-member-${m.id}`}
+                >
+                  <div
+                    className={cn(
+                      "h-7 w-7 rounded-full border bg-gradient-to-br",
+                      m.color,
+                    )}
+                  />
+                  <div className="text-sm">{m.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
