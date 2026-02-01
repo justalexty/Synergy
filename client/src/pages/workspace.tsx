@@ -927,7 +927,9 @@ export default function WorkspacePage() {
   const [selected, setSelected] = useState(() => new Date());
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isNewTask, setIsNewTask] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isNewEvent, setIsNewEvent] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [metricFilter, setMetricFilter] = useState<"week" | "progress" | "focus" | null>(null);
@@ -960,17 +962,15 @@ export default function WorkspacePage() {
 
   const createTaskMutation = useMutation({
     mutationFn: api.tasks.create,
-    onSuccess: (newTask) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      setSelectedTask(newTask);
     },
   });
 
   const createEventMutation = useMutation({
     mutationFn: api.events.create,
-    onSuccess: (newEvent) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
-      setSelectedEvent(newEvent);
     },
   });
 
@@ -1099,7 +1099,8 @@ export default function WorkspacePage() {
   }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects, filters]);
 
   function onCreate() {
-    createTaskMutation.mutate({
+    setSelectedTask({
+      id: "__new__",
       title: "",
       status: "todo",
       projectId: null,
@@ -1107,20 +1108,24 @@ export default function WorkspacePage() {
       due: null,
       priority: "Medium",
     });
+    setIsNewTask(true);
   }
 
   function addQuickEvent() {
-    createEventMutation.mutate({
+    setSelectedEvent({
+      id: "__new__",
       title: "",
       start: selected,
       end: null,
       color: "primary",
       attendeeIds: [],
     });
+    setIsNewEvent(true);
   }
 
   function addQuickTask() {
-    createTaskMutation.mutate({
+    setSelectedTask({
+      id: "__new__",
       title: "",
       status: "todo",
       projectId: null,
@@ -1128,6 +1133,7 @@ export default function WorkspacePage() {
       due: null,
       priority: "Medium",
     });
+    setIsNewTask(true);
   }
 
   return (
@@ -1205,12 +1211,12 @@ export default function WorkspacePage() {
                     <Separator className="my-3" />
                     <div className="space-y-2">
                       {filteredTasks.slice(0, 5).map((t) => (
-                        <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} onClick={() => setSelectedTask(t)} />
+                        <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} onClick={() => { setSelectedTask(t); setIsNewTask(false); }} />
                       ))}
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
@@ -1271,7 +1277,7 @@ export default function WorkspacePage() {
                     events={events}
                     tasks={tasks}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); }} onAddTask={addQuickTask} />
                 </div>
               </div>
             ) : null}
@@ -1310,7 +1316,7 @@ export default function WorkspacePage() {
 
                 <div className="space-y-2">
                   {filteredTasks.map((t) => (
-                    <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} onClick={() => setSelectedTask(t)} />
+                    <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} onClick={() => { setSelectedTask(t); setIsNewTask(false); }} />
                   ))}
                 </div>
               </div>
@@ -1319,10 +1325,10 @@ export default function WorkspacePage() {
         </div>
       </div>
       {/* Task Detail Dialog */}
-      <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
+      <Dialog open={!!selectedTask} onOpenChange={(open) => { if (!open) { setSelectedTask(null); setIsNewTask(false); } }}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
+            <DialogTitle>{isNewTask ? "New Task" : "Edit Task"}</DialogTitle>
           </DialogHeader>
           {selectedTask && (
             <div className="space-y-4 pt-2">
@@ -1473,40 +1479,54 @@ export default function WorkspacePage() {
                 </Popover>
               </div>
               <div className="flex justify-between gap-2 pt-2">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    deleteTaskMutation.mutate(selectedTask.id);
-                    setSelectedTask(null);
-                  }}
-                  data-testid="button-delete-task"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </Button>
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={() => setSelectedTask(null)} data-testid="button-cancel-task">
+                {!isNewTask && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      deleteTaskMutation.mutate(selectedTask.id);
+                      setSelectedTask(null);
+                    }}
+                    data-testid="button-delete-task"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                )}
+                <div className="flex gap-2 ml-auto">
+                  <Button variant="secondary" onClick={() => { setSelectedTask(null); setIsNewTask(false); }} data-testid="button-cancel-task">
                     Cancel
                   </Button>
                   <Button
                     onClick={() => {
-                      updateTaskMutation.mutate({
-                        id: selectedTask.id,
-                        data: {
+                      if (isNewTask) {
+                        createTaskMutation.mutate({
                           title: selectedTask.title,
                           status: selectedTask.status,
                           priority: selectedTask.priority,
                           projectId: selectedTask.projectId,
                           assigneeIds: selectedTask.assigneeIds,
                           due: selectedTask.due,
-                        },
-                      });
+                        });
+                      } else {
+                        updateTaskMutation.mutate({
+                          id: selectedTask.id,
+                          data: {
+                            title: selectedTask.title,
+                            status: selectedTask.status,
+                            priority: selectedTask.priority,
+                            projectId: selectedTask.projectId,
+                            assigneeIds: selectedTask.assigneeIds,
+                            due: selectedTask.due,
+                          },
+                        });
+                      }
                       setSelectedTask(null);
+                      setIsNewTask(false);
                     }}
                     data-testid="button-save-task"
                   >
-                    Save Changes
+                    Save
                   </Button>
                 </div>
               </div>
@@ -1515,10 +1535,10 @@ export default function WorkspacePage() {
         </DialogContent>
       </Dialog>
       {/* Event Detail Dialog */}
-      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => { if (!open) { setSelectedEvent(null); setIsNewEvent(false); } }}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Meeting</DialogTitle>
+            <DialogTitle>{isNewEvent ? "New Meeting" : "Edit Meeting"}</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
             <div className="space-y-4 pt-2">
@@ -1605,36 +1625,50 @@ export default function WorkspacePage() {
                 </Popover>
               </div>
               <div className="flex justify-between gap-2 pt-2">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    deleteEventMutation.mutate(selectedEvent.id);
-                    setSelectedEvent(null);
-                  }}
-                  data-testid="button-delete-event"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </Button>
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={() => setSelectedEvent(null)} data-testid="button-cancel-event">
+                {!isNewEvent && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      deleteEventMutation.mutate(selectedEvent.id);
+                      setSelectedEvent(null);
+                    }}
+                    data-testid="button-delete-event"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                )}
+                <div className="flex gap-2 ml-auto">
+                  <Button variant="secondary" onClick={() => { setSelectedEvent(null); setIsNewEvent(false); }} data-testid="button-cancel-event">
                     Cancel
                   </Button>
                   <Button
                     onClick={() => {
-                      updateEventMutation.mutate({
-                        id: selectedEvent.id,
-                        data: {
+                      if (isNewEvent) {
+                        createEventMutation.mutate({
                           title: selectedEvent.title,
+                          start: selectedEvent.start,
+                          end: selectedEvent.end,
+                          color: selectedEvent.color,
                           attendeeIds: selectedEvent.attendeeIds,
-                        },
-                      });
+                        });
+                      } else {
+                        updateEventMutation.mutate({
+                          id: selectedEvent.id,
+                          data: {
+                            title: selectedEvent.title,
+                            start: selectedEvent.start,
+                            attendeeIds: selectedEvent.attendeeIds,
+                          },
+                        });
+                      }
                       setSelectedEvent(null);
+                      setIsNewEvent(false);
                     }}
                     data-testid="button-save-event"
                   >
-                    Save Changes
+                    Save
                   </Button>
                 </div>
               </div>
