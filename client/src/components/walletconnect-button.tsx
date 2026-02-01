@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Sparkles, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { BrowserProvider } from "ethers";
 
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,6 @@ export default function WalletConnectButton({ onConnected }: Props) {
           : canConnect
             ? "Connect wallet"
             : "No wallet"}
-      <Sparkles className="ml-2 h-4 w-4 opacity-70" />
     </Button>
   );
 }
