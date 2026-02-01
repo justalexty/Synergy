@@ -54,9 +54,10 @@ export default function LoginPage({ onAuthenticated }: Props) {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background crt">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--accent)/0.08),transparent_70%)] pointer-events-none" />
-      <div className="fixed inset-0 opacity-[0.015] pointer-events-none grain" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background crt-lines noise">
+      <div className="absolute inset-0 bg-grid opacity-40" />
+      <div className="absolute inset-0 bg-radial" />
+      <div className="absolute inset-0 bg-radial-2" />
       <Card className="relative z-10 glass shadow-soft rounded-2xl p-8 max-w-md w-full mx-4 neon-accent">
         <div className="flex flex-col items-center text-center">
           <div
