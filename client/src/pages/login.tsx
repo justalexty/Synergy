@@ -1,9 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Handshake, Wallet, ShieldX } from "lucide-react";
+import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { BrowserProvider } from "ethers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import "@/lib/web3modal";
 
 type Props = {
   onAuthenticated: (address: string, userName: string) => void;
@@ -12,45 +14,55 @@ type Props = {
 export default function LoginPage({ onAuthenticated }: Props) {
   const [status, setStatus] = useState<"idle" | "connecting" | "verifying" | "denied">("idle");
   const [error, setError] = useState<string | null>(null);
+  
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider("eip155");
 
-  const canConnect = useMemo(
-    () => typeof window !== "undefined" && (window as any).ethereum,
-    []
-  );
+  useEffect(() => {
+    async function verifyWallet() {
+      if (isConnected && address && status === "connecting") {
+        setStatus("verifying");
+        setError(null);
+
+        try {
+          const res = await fetch("/api/auth/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ walletAddress: address }),
+          });
+
+          const data = await res.json();
+
+          if (data.authorized) {
+            onAuthenticated(address, data.userName);
+          } else {
+            setStatus("denied");
+          }
+        } catch (err: any) {
+          setError(err?.message || "Verification failed");
+          setStatus("idle");
+        }
+      }
+    }
+
+    verifyWallet();
+  }, [isConnected, address, status, onAuthenticated]);
 
   async function handleLogin() {
-    if (!canConnect) return;
-
     setStatus("connecting");
     setError(null);
-
     try {
-      const eth = (window as any).ethereum;
-      await eth.request({ method: "eth_requestAccounts" });
-
-      const provider = new BrowserProvider(eth);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-
-      setStatus("verifying");
-
-      const res = await fetch("/api/auth/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: address }),
-      });
-
-      const data = await res.json();
-
-      if (data.authorized) {
-        onAuthenticated(address, data.userName);
-      } else {
-        setStatus("denied");
-      }
+      await open();
     } catch (err: any) {
       setError(err?.message || "Connection failed");
       setStatus("idle");
     }
+  }
+
+  function handleTryAgain() {
+    setStatus("idle");
+    setError(null);
   }
 
   return (
@@ -93,7 +105,7 @@ export default function LoginPage({ onAuthenticated }: Props) {
                 </div>
               </div>
               <Button
-                onClick={() => setStatus("idle")}
+                onClick={handleTryAgain}
                 variant="outline"
                 className="w-full shadow-soft"
                 data-testid="button-try-again"
@@ -105,7 +117,7 @@ export default function LoginPage({ onAuthenticated }: Props) {
             <div className="w-full">
               <Button
                 onClick={handleLogin}
-                disabled={!canConnect || status === "connecting" || status === "verifying"}
+                disabled={status === "connecting" || status === "verifying"}
                 className={cn(
                   "w-full shadow-soft neon-ring h-12 text-base",
                   (status === "connecting" || status === "verifying") && "opacity-80"
@@ -117,20 +129,12 @@ export default function LoginPage({ onAuthenticated }: Props) {
                   ? "Connecting..."
                   : status === "verifying"
                     ? "Verifying..."
-                    : canConnect
-                      ? "Log In"
-                      : "No Wallet Detected"}
+                    : "Log In"}
               </Button>
 
               {error && (
                 <p className="mt-4 text-sm text-destructive" data-testid="text-error">
                   {error}
-                </p>
-              )}
-
-              {!canConnect && (
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Please install a Web3 wallet like MetaMask to continue.
                 </p>
               )}
             </div>
