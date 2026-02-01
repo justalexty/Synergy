@@ -1071,7 +1071,11 @@ export default function WorkspacePage() {
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
 
   const thisWeekTasks = useMemo(() => 
-    tasks.filter((t) => t.due && t.due >= weekStart && t.due <= weekEnd),
+    tasks.filter((t) => {
+      if (!t.due) return false;
+      const dueDate = new Date(t.due);
+      return dueDate >= weekStart && dueDate <= weekEnd;
+    }),
     [tasks, weekStart, weekEnd]
   );
 
