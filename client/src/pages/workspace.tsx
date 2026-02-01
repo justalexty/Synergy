@@ -107,10 +107,74 @@ function priorityClass(p: string) {
   }
 }
 
-const EMOJI_OPTIONS = ["✦", "◈", "◌", "◆", "△", "○", "□", "◇", "▽", "✧", "☆", "⬡", "ballot", "🎟", "ψ", "☁", "banana", "snail", "€", "$", "☽"];
+const EMOJI_OPTIONS = ["star4", "diamond-dot", "circle-dashed", "diamond", "triangle", "circle", "square", "diamond-outline", "triangle-down", "sparkle", "star", "hexagon", "ballot", "ticket", "psi", "cloud", "banana", "snail", "euro", "dollar", "moon"];
 
 const CustomEmojiSvgs: Record<string, React.ReactNode> = {
-  ballot: (
+  "star4": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 2v20M2 12h20M6 6l12 12M18 6L6 18" />
+    </svg>
+  ),
+  "diamond-dot": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 3l9 9-9 9-9-9z" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  ),
+  "circle-dashed": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 3a9 9 0 0 1 6.36 2.64" />
+      <path d="M21 12a9 9 0 0 1-2.64 6.36" />
+      <path d="M12 21a9 9 0 0 1-6.36-2.64" />
+      <path d="M3 12a9 9 0 0 1 2.64-6.36" />
+    </svg>
+  ),
+  "diamond": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 3l9 9-9 9-9-9z" />
+    </svg>
+  ),
+  "triangle": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 4L3 20h18L12 4z" />
+    </svg>
+  ),
+  "circle": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <circle cx="12" cy="12" r="9" />
+    </svg>
+  ),
+  "square": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <rect x="4" y="4" width="16" height="16" rx="1" />
+    </svg>
+  ),
+  "diamond-outline": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 5l7 7-7 7-7-7z" />
+    </svg>
+  ),
+  "triangle-down": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 20L3 4h18L12 20z" />
+    </svg>
+  ),
+  "sparkle": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8" />
+    </svg>
+  ),
+  "star": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </svg>
+  ),
+  "hexagon": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z" />
+    </svg>
+  ),
+  "ballot": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18" />
@@ -118,20 +182,54 @@ const CustomEmojiSvgs: Record<string, React.ReactNode> = {
       <path d="M8 15l2 2 4-4" />
     </svg>
   ),
-  banana: (
+  "ticket": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M2 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a3 3 0 0 1-3-3 3 3 0 0 1 3-3V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+      <path d="M9 5v2M9 11v2M9 17v2" />
+    </svg>
+  ),
+  "psi": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 3v18" />
+      <path d="M5 8c0 4 3 6 7 6s7-2 7-6" />
+    </svg>
+  ),
+  "cloud": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+    </svg>
+  ),
+  "banana": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
       <path d="M5 17c0-5 4-10 12-10" />
       <path d="M5 17c0 2 1 3 2.5 3s3.5-2 6-5c2.5-3 5.5-6 8.5-6" />
       <path d="M17 7l1-2" />
     </svg>
   ),
-  snail: (
+  "snail": (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
       <circle cx="12" cy="13" r="5" />
       <path d="M12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
       <path d="M7 13c-2 0-4 1-4 3" />
       <path d="M5 11l-1-2" />
       <path d="M3 12l-1-1" />
+    </svg>
+  ),
+  "euro": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M17.5 7A6.5 6.5 0 0 0 7 12a6.5 6.5 0 0 0 10.5 5" />
+      <path d="M4 10h10M4 14h10" />
+    </svg>
+  ),
+  "dollar": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 2v20" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </svg>
+  ),
+  "moon": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   ),
 };
