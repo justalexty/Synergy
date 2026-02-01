@@ -1300,9 +1300,7 @@ export default function WorkspacePage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-sm font-medium" data-testid="text-recents-title">Recent Tasks</div>
-                        <div className="text-xs text-muted-foreground" data-testid="text-recents-subtitle">
-                          A quick pulse across the team
-                        </div>
+                        <div className="text-xs text-muted-foreground" data-testid="text-recents-subtitle">a quick workflow pulse</div>
                       </div>
                       <Button variant="secondary" size="sm" onClick={() => setActive("tasks")} data-testid="button-viewall">View All</Button>
                     </div>
