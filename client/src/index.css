@@ -65,8 +65,8 @@
   --popover: 42 40% 98%;
   --popover-foreground: 15 45% 22%;
 
-  /* Juicy blood orange primary - warm retro vibes */
-  --primary: 16 88% 52%;
+  /* Deep plum/burgundy primary - wine bar vibes */
+  --primary: 345 42% 38%;
   --primary-foreground: 0 0% 100%;
 
   /* Warm beige secondary */
@@ -76,33 +76,34 @@
   --muted: 38 20% 90%;
   --muted-foreground: 30 10% 45%;
 
-  /* Warm amber/orange accent - coffeehouse warmth */
-  --accent: 28 85% 55%;
+  /* Rose gold/copper accent - elegant warmth */
+  --accent: 18 50% 55%;
   --accent-foreground: 0 0% 100%;
 
-  /* Warm terracotta for destructive - no harsh reds */
-  --destructive: 355 55% 48%;
+  /* Warm wine for destructive */
+  --destructive: 355 50% 45%;
   --destructive-foreground: 0 0% 100%;
 
   /* Softer, warmer borders */
   --border: 35 18% 82%;
   --input: 35 18% 78%;
-  --ring: 16 88% 52%;
+  --ring: 350 35% 58%;
 
-  --chart-1: 16 88% 52%;
-  --chart-2: 28 85% 55%;
-  --chart-3: 280 50% 55%;
-  --chart-4: 45 90% 52%;
-  --chart-5: 145 55% 42%;
+  /* Wine-inspired chart palette */
+  --chart-1: 345 42% 38%;
+  --chart-2: 350 45% 65%;
+  --chart-3: 18 50% 55%;
+  --chart-4: 42 55% 65%;
+  --chart-5: 150 30% 45%;
 
   --sidebar: 40 28% 95%;
   --sidebar-foreground: 15 45% 22%;
   --sidebar-border: 35 18% 82%;
-  --sidebar-primary: 16 88% 52%;
+  --sidebar-primary: 345 42% 38%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 38 25% 90%;
   --sidebar-accent-foreground: 15 45% 22%;
-  --sidebar-ring: 16 88% 52%;
+  --sidebar-ring: 350 35% 58%;
 
   /* Retro-friendly fonts */
   --font-sans: "Space Mono", "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
@@ -116,7 +117,7 @@
 }
 
 .dark {
-  /* Dark mode: warm sepia-tinted dark */
+  /* Dark mode: warm sepia-tinted dark with wine accents */
   --background: 30 18% 10%;
   --foreground: 40 25% 90%;
 
@@ -126,7 +127,7 @@
   --popover: 30 16% 13%;
   --popover-foreground: 40 25% 90%;
 
-  --primary: 16 85% 58%;
+  --primary: 345 50% 55%;
   --primary-foreground: 30 18% 10%;
 
   --secondary: 30 14% 18%;
@@ -135,24 +136,24 @@
   --muted: 30 14% 18%;
   --muted-foreground: 35 12% 60%;
 
-  --accent: 28 80% 58%;
+  --accent: 18 55% 60%;
   --accent-foreground: 30 18% 10%;
 
-  --destructive: 0 65% 50%;
+  --destructive: 355 55% 50%;
   --destructive-foreground: 0 0% 100%;
 
   --border: 30 12% 22%;
   --input: 30 12% 26%;
-  --ring: 16 85% 58%;
+  --ring: 350 40% 60%;
 
   --sidebar: 30 16% 12%;
   --sidebar-foreground: 40 25% 90%;
   --sidebar-border: 30 12% 22%;
-  --sidebar-primary: 16 85% 58%;
+  --sidebar-primary: 345 50% 55%;
   --sidebar-primary-foreground: 30 18% 10%;
   --sidebar-accent: 30 14% 18%;
   --sidebar-accent-foreground: 40 25% 90%;
-  --sidebar-ring: 16 85% 58%;
+  --sidebar-ring: 350 40% 60%;
 }
 
 @layer base {
