@@ -22,6 +22,7 @@ import {
 import {
   CalendarDays,
   CheckCircle2,
+  Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Filter,
