@@ -7,15 +7,22 @@ import {
   type InsertTask,
   type Event,
   type InsertEvent,
+  type ApprovedWallet,
+  type InsertApprovedWallet,
   members,
   projects,
   tasks,
   events,
+  approvedWallets,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
+  // Approved Wallets
+  getApprovedWallet(walletAddress: string): Promise<ApprovedWallet | undefined>;
+  createApprovedWallet(wallet: InsertApprovedWallet): Promise<ApprovedWallet>;
+
   // Members
   getMembers(): Promise<Member[]>;
   getMember(id: string): Promise<Member | undefined>;
@@ -46,6 +53,23 @@ export interface IStorage {
 }
 
 export class DbStorage implements IStorage {
+  // Approved Wallets
+  async getApprovedWallet(walletAddress: string): Promise<ApprovedWallet | undefined> {
+    const result = await db
+      .select()
+      .from(approvedWallets)
+      .where(eq(approvedWallets.walletAddress, walletAddress.toLowerCase()));
+    return result[0];
+  }
+
+  async createApprovedWallet(wallet: InsertApprovedWallet): Promise<ApprovedWallet> {
+    const result = await db
+      .insert(approvedWallets)
+      .values({ ...wallet, walletAddress: wallet.walletAddress.toLowerCase() })
+      .returning();
+    return result[0];
+  }
+
   // Members
   async getMembers(): Promise<Member[]> {
     return db.select().from(members);

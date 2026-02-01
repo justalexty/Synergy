@@ -3,6 +3,16 @@ import { pgTable, text, varchar, timestamp, integer } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const approvedWallets = pgTable("approved_wallets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: text("wallet_address").notNull().unique(),
+  userName: text("user_name").notNull(),
+});
+
+export const insertApprovedWalletSchema = createInsertSchema(approvedWallets).omit({ id: true });
+export type InsertApprovedWallet = z.infer<typeof insertApprovedWalletSchema>;
+export type ApprovedWallet = typeof approvedWallets.$inferSelect;
+
 export const members = pgTable("members", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   walletAddress: text("wallet_address").unique(),

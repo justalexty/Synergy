@@ -6,6 +6,7 @@ import {
   insertProjectSchema,
   insertTaskSchema,
   insertEventSchema,
+  insertApprovedWalletSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -13,6 +14,23 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express,
 ): Promise<Server> {
+  // Auth - verify wallet
+  app.post("/api/auth/verify", async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      if (!walletAddress) {
+        return res.status(400).json({ error: "Wallet address required" });
+      }
+      const approved = await storage.getApprovedWallet(walletAddress);
+      if (approved) {
+        return res.json({ authorized: true, userName: approved.userName });
+      }
+      return res.json({ authorized: false });
+    } catch {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Members
   app.get("/api/members", async (_req, res) => {
     const members = await storage.getMembers();
