@@ -27,20 +27,26 @@ export default function LoginPage({ onAuthenticated }: Props) {
         setError(null);
 
         try {
+          console.log("[login:effect] Calling /api/auth/verify for", address);
           const res = await fetch("/api/auth/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ walletAddress: address }),
           });
 
+          console.log("[login:effect] Response status:", res.status);
           const data = await res.json();
+          console.log("[login:effect] Response data:", JSON.stringify(data));
 
-          if (data.authorized) {
-            onAuthenticated(address, data.userName);
+          if (data.authorized === true) {
+            console.log("[login:effect] Authorized!");
+            onAuthenticated(address, data.userName || "User");
           } else {
+            console.log("[login:effect] Not authorized, data.authorized =", data.authorized);
             setStatus("denied");
           }
         } catch (err: any) {
+          console.error("[login:effect] Error:", err);
           setError(err?.message || "Verification failed");
           setStatus("idle");
         }
@@ -69,13 +75,13 @@ export default function LoginPage({ onAuthenticated }: Props) {
 
         console.log("[login] Response status:", res.status);
         const data = await res.json();
-        console.log("[login] Response data:", data);
+        console.log("[login] Response data:", JSON.stringify(data));
 
-        if (data.authorized) {
+        if (data.authorized === true) {
           console.log("[login] Authorized! Calling onAuthenticated");
-          onAuthenticated(address, data.userName);
+          onAuthenticated(address, data.userName || "User");
         } else {
-          console.log("[login] Not authorized, showing denied");
+          console.log("[login] Not authorized, data.authorized =", data.authorized);
           setStatus("denied");
         }
       } catch (err: any) {
