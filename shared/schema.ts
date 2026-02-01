@@ -35,7 +35,9 @@ export const tasks = pgTable("tasks", {
   priority: text("priority").notNull().default("Medium"),
 });
 
-export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true });
+export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true }).extend({
+  due: z.coerce.date().nullable(),
+});
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type Task = typeof tasks.$inferSelect;
 
@@ -48,6 +50,9 @@ export const events = pgTable("events", {
   attendeeIds: text("attendee_ids").array().notNull().default(sql`'{}'::text[]`),
 });
 
-export const insertEventSchema = createInsertSchema(events).omit({ id: true });
+export const insertEventSchema = createInsertSchema(events).omit({ id: true }).extend({
+  start: z.coerce.date(),
+  end: z.coerce.date().nullable(),
+});
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Event = typeof events.$inferSelect;
