@@ -1158,28 +1158,28 @@ export default function WorkspacePage() {
     setIsNewTask(true);
   }
 
-  function addQuickEvent() {
+  function addQuickEvent(fromCalendar: boolean = false) {
     setSelectedEvent({
       id: "__new__",
       title: "",
-      start: selected,
+      start: fromCalendar ? selected : new Date(),
       end: null,
       color: "primary",
       attendeeIds: [],
-    });
+    } as Event);
     setIsNewEvent(true);
-    setEventDateTouched(false);
+    setEventDateTouched(fromCalendar);
     setEventTimeTouched(false);
   }
 
-  function addQuickTask() {
+  function addQuickTask(fromCalendar: boolean = false) {
     setSelectedTask({
       id: "__new__",
       title: "",
       status: "todo",
       projectId: null,
       assigneeIds: [],
-      due: null,
+      due: fromCalendar ? selected : null,
       priority: "Medium",
     });
     setIsNewTask(true);
@@ -1265,7 +1265,7 @@ export default function WorkspacePage() {
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={() => addQuickTask(true)} />
                 </div>
               </div>
             ) : null}
@@ -1309,7 +1309,7 @@ export default function WorkspacePage() {
                     </Button>
                     <Button
                       className="shadow-soft"
-                      onClick={addQuickEvent}
+                      onClick={() => addQuickEvent(true)}
                       data-testid="button-add-event"
                     >
                       <Plus className="mr-2 h-4 w-4" />
@@ -1326,7 +1326,7 @@ export default function WorkspacePage() {
                     events={sortedEvents}
                     tasks={tasks}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={addQuickTask} />
+                  <DayAgenda selected={selected} tasks={tasks} events={sortedEvents} onTaskClick={(t) => { setSelectedTask(t); setIsNewTask(false); }} onEventClick={(e) => { setSelectedEvent(e); setIsNewEvent(false); setEventDateTouched(false); setEventTimeTouched(false); }} onAddTask={() => addQuickTask(true)} />
                 </div>
               </div>
             ) : null}
@@ -1679,18 +1679,19 @@ export default function WorkspacePage() {
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-event-date">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
+                      {(!isNewEvent || eventDateTouched) && selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={selectedEvent.start ? new Date(selectedEvent.start) : undefined}
+                      selected={(!isNewEvent || eventDateTouched) ? new Date(selectedEvent.start) : undefined}
                       onSelect={(date) => {
                         if (date) {
                           const existing = new Date(selectedEvent.start);
                           date.setHours(existing.getHours(), existing.getMinutes());
                           setSelectedEvent({ ...selectedEvent, start: date });
+                          setEventDateTouched(true);
                         }
                       }}
                       initialFocus
