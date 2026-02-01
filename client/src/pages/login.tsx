@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Sparkles, Wallet, ShieldX } from "lucide-react";
+import { Handshake, Wallet, ShieldX } from "lucide-react";
 import { BrowserProvider } from "ethers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -63,7 +63,7 @@ export default function LoginPage({ onAuthenticated }: Props) {
             className="grid h-16 w-16 place-items-center rounded-2xl border bg-card/70 shadow-soft neon-ring mb-6"
             data-testid="badge-logo"
           >
-            <Sparkles className="h-8 w-8 text-[hsl(var(--accent))] text-neon" />
+            <Handshake className="h-8 w-8 text-[hsl(var(--primary))] text-neon" strokeWidth={2.4} />
           </div>
 
           <h1
