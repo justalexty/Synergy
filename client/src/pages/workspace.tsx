@@ -348,25 +348,6 @@ function LeftRail({
           </button>
         ))}
       </div>
-
-      <div className="mt-auto rounded-xl border bg-card/70 p-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-sm font-medium" data-testid="text-upgrade-title">
-              Free workspace
-            </div>
-            <div
-              className="text-xs text-muted-foreground"
-              data-testid="text-upgrade-subtitle"
-            >
-              Invite up to 5 teammates
-            </div>
-          </div>
-          <Button size="sm" variant="secondary" data-testid="button-upgrade">
-            Upgrade
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
