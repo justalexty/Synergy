@@ -72,7 +72,7 @@ function statusClass(s: Status) {
     case "todo":
       return "bg-[hsl(35_20%_88%)] text-[hsl(25_30%_40%)] border-[hsl(30_20%_75%)]";
     case "in_progress":
-      return "bg-[hsl(155_35%_88%)] text-[hsl(160_45%_28%)] border-[hsl(155_30%_70%)]";
+      return "bg-[hsl(30_35%_88%)] text-[hsl(25_50%_32%)] border-[hsl(28_30%_70%)]";
     case "blocked":
       return "bg-[hsl(355_60%_92%)] text-[hsl(355_55%_45%)] border-[hsl(355_50%_78%)]";
     case "done":
