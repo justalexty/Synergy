@@ -1,4 +1,11 @@
 import { useMemo, useState } from "react";
+
+const _memberColorSafelist = [
+  "from-rose-400/40", "to-pink-300/40",
+  "from-red-800/50", "to-rose-700/45",
+  "from-amber-700/40", "to-red-600/40",
+  "from-rose-600/45", "to-red-500/40",
+];
 import {
   addDays,
   endOfMonth,
