@@ -18,15 +18,24 @@ export async function registerRoutes(
   app.post("/api/auth/verify", async (req, res) => {
     try {
       const { walletAddress } = req.body;
+      console.log("[auth/verify] Received wallet address:", walletAddress);
       if (!walletAddress) {
         return res.status(400).json({ error: "Wallet address required" });
       }
-      const approved = await storage.getApprovedWallet(walletAddress);
+      // Handle CAIP-10 format (eip155:1:0x...) by extracting just the address
+      let cleanAddress = walletAddress;
+      if (walletAddress.includes(":")) {
+        cleanAddress = walletAddress.split(":").pop() || walletAddress;
+      }
+      console.log("[auth/verify] Cleaned address:", cleanAddress);
+      const approved = await storage.getApprovedWallet(cleanAddress);
+      console.log("[auth/verify] Approved:", approved);
       if (approved) {
         return res.json({ authorized: true, userName: approved.userName });
       }
       return res.json({ authorized: false });
-    } catch {
+    } catch (err) {
+      console.error("[auth/verify] Error:", err);
       res.status(500).json({ error: "Internal server error" });
     }
   });
