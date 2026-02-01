@@ -388,10 +388,7 @@ function TaskRow({
             {statusLabel[t.status as Status]}
           </div>
           <div
-            className={cn(
-              "rounded-md border px-2 py-0.5 text-xs",
-              priorityClass(t.priority),
-            )}
+            className="rounded-md border px-2 py-0.5 text-xs bg-[hsl(355_45%_95%)] border-[hsl(354_35%_85%)] text-[#ff7d8f]"
             data-testid={`badge-priority-${t.id}`}
           >
             {t.priority}
@@ -411,7 +408,6 @@ function TaskRow({
           {t.title}
         </div>
       </div>
-
       <div className="flex items-center gap-3">
         <div className="hidden text-xs text-muted-foreground md:block" data-testid={`text-due-${t.id}`}>
           {t.due ? format(t.due, "MMM d") : "—"}
