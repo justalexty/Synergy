@@ -55,6 +55,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import WalletConnectButton from "@/components/walletconnect-button";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -474,16 +476,20 @@ function TaskRow({
   );
 }
 
+type CalendarItem = { id: string; title: string; color: string; type: "event" | "task" };
+
 function MonthGrid({
   month,
   selected,
   onSelect,
   events,
+  tasks,
 }: {
   month: Date;
   selected: Date;
   onSelect: (d: Date) => void;
   events: Event[];
+  tasks: Task[];
 }) {
   const monthStart = startOfMonth(month);
   const monthEnd = endOfMonth(month);
@@ -498,13 +504,19 @@ function MonthGrid({
   }
 
   const byDay = useMemo(() => {
-    const map = new Map<string, Event[]>();
+    const map = new Map<string, CalendarItem[]>();
     for (const e of events) {
       const k = format(e.start, "yyyy-MM-dd");
-      map.set(k, [...(map.get(k) ?? []), e]);
+      map.set(k, [...(map.get(k) ?? []), { id: e.id, title: e.title, color: e.color, type: "event" }]);
+    }
+    for (const t of tasks) {
+      if (t.due) {
+        const k = format(new Date(t.due), "yyyy-MM-dd");
+        map.set(k, [...(map.get(k) ?? []), { id: t.id, title: t.title, color: "task", type: "task" }]);
+      }
     }
     return map;
-  }, [events]);
+  }, [events, tasks]);
 
   return (
     <div className="rounded-2xl border bg-card/70 p-3 shadow-soft">
@@ -519,7 +531,7 @@ function MonthGrid({
       <div className="grid grid-cols-7 gap-2">
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
-          const dayEvents = byDay.get(key) ?? [];
+          const dayItems = byDay.get(key) ?? [];
           const inMonth = isSameMonth(day, month);
           const isSel = isSameDay(day, selected);
 
@@ -546,7 +558,7 @@ function MonthGrid({
                 >
                   {format(day, "d")}
                 </div>
-                {dayEvents.length > 0 ? (
+                {dayItems.length > 0 ? (
                   <div
                     className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent))] opacity-80"
                     data-testid={`status-dayhasitems-${key}`}
@@ -555,25 +567,27 @@ function MonthGrid({
               </div>
 
               <div className="mt-2 flex flex-col gap-1">
-                {dayEvents.slice(0, 2).map((e) => (
+                {dayItems.slice(0, 2).map((item) => (
                   <div
-                    key={e.id}
+                    key={item.id}
                     className={cn(
                       "truncate rounded-md px-2 py-1 text-[11px]",
-                      e.color === "primary"
+                      item.color === "primary"
                         ? "bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))]"
-                        : e.color === "accent"
+                        : item.color === "accent"
                           ? "bg-[hsl(var(--accent)/0.14)] text-[hsl(var(--accent))]"
-                          : "bg-muted text-muted-foreground",
+                          : item.color === "task"
+                            ? "bg-[hsl(355_45%_95%)] text-[hsl(var(--foreground))]"
+                            : "bg-muted text-muted-foreground",
                     )}
-                    data-testid={`pill-event-${e.id}`}
+                    data-testid={`pill-${item.type}-${item.id}`}
                   >
-                    {e.title}
+                    {item.type === "task" ? "📋 " : ""}{item.title}
                   </div>
                 ))}
-                {dayEvents.length > 2 ? (
+                {dayItems.length > 2 ? (
                   <div className="text-[11px] text-muted-foreground" data-testid={`text-more-${key}`}>
-                    +{dayEvents.length - 2} more
+                    +{dayItems.length - 2} more
                   </div>
                 ) : null}
               </div>
@@ -984,6 +998,7 @@ export default function WorkspacePage() {
                     selected={selected}
                     onSelect={setSelected}
                     events={events}
+                    tasks={tasks}
                   />
                   <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} />
                 </div>
@@ -1156,6 +1171,36 @@ export default function WorkspacePage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label>Deadline</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !selectedTask.due && "text-muted-foreground"
+                      )}
+                      data-testid="button-task-deadline"
+                    >
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      {selectedTask.due
+                        ? format(new Date(selectedTask.due), "PPP")
+                        : "Pick a deadline"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedTask.due ? new Date(selectedTask.due) : undefined}
+                      onSelect={(date) =>
+                        setSelectedTask({ ...selectedTask, due: date || null })
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
               <div className="flex justify-between gap-2 pt-2">
                 <Button
                   variant="destructive"
@@ -1183,6 +1228,7 @@ export default function WorkspacePage() {
                           priority: selectedTask.priority,
                           projectId: selectedTask.projectId,
                           assigneeIds: selectedTask.assigneeIds,
+                          due: selectedTask.due,
                         },
                       });
                       setSelectedTask(null);
