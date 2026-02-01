@@ -29,7 +29,7 @@ export const tasks = pgTable("tasks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   status: text("status").notNull().default("todo"),
-  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }),
   assigneeIds: text("assignee_ids").array().notNull().default(sql`'{}'::text[]`),
   due: timestamp("due"),
   priority: text("priority").notNull().default("Medium"),

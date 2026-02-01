@@ -267,7 +267,9 @@ function LeftRail({
   const taskCountByProject = useMemo(() => {
     const counts = new Map<string, number>();
     tasks.forEach((t) => {
-      counts.set(t.projectId, (counts.get(t.projectId) || 0) + 1);
+      if (t.projectId) {
+        counts.set(t.projectId, (counts.get(t.projectId) || 0) + 1);
+      }
     });
     return counts;
   }, [tasks]);
@@ -805,7 +807,7 @@ export default function WorkspacePage() {
       result = inProgressTasks;
     } else if (metricFilter === "focus") {
       const activeProjectIds = new Set(activeProjects.map((p) => p.id));
-      result = result.filter((t) => activeProjectIds.has(t.projectId));
+      result = result.filter((t) => t.projectId && activeProjectIds.has(t.projectId));
     }
     
     if (selectedProject) {
@@ -825,12 +827,10 @@ export default function WorkspacePage() {
   }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects]);
 
   function onCreate() {
-    if (projects.length === 0) return;
-    
     createTaskMutation.mutate({
       title: "",
       status: "todo",
-      projectId: projects[0].id,
+      projectId: null,
       assigneeIds: [],
       due: null,
       priority: "Medium",
@@ -848,12 +848,10 @@ export default function WorkspacePage() {
   }
 
   function addQuickTask() {
-    if (projects.length === 0) return;
-    
     createTaskMutation.mutate({
       title: "",
       status: "todo",
-      projectId: projects[0].id,
+      projectId: null,
       assigneeIds: [],
       due: null,
       priority: "Medium",
@@ -1104,7 +1102,7 @@ export default function WorkspacePage() {
               <div className="space-y-2">
                 <Label>Project</Label>
                 <Select
-                  value={selectedTask.projectId}
+                  value={selectedTask.projectId ?? undefined}
                   onValueChange={(v) => setSelectedTask({ ...selectedTask, projectId: v })}
                 >
                   <SelectTrigger data-testid="select-task-project">
