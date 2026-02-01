@@ -1319,10 +1319,10 @@ export default function WorkspacePage() {
                       )}
                       data-testid="button-task-deadline"
                     >
-                      <CalendarDays className="mr-2 h-4 w-4" />
-                      {selectedTask.due
-                        ? format(new Date(selectedTask.due), "PPP")
-                        : "Pick a deadline"}
+                      <CalendarDays className="h-4 w-4" />
+                      {selectedTask.due && (
+                        <span className="ml-2">{format(new Date(selectedTask.due), "PPP")}</span>
+                      )}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start" side="top">
@@ -1434,7 +1434,7 @@ export default function WorkspacePage() {
                   }}
                 >
                   <SelectTrigger data-testid="select-add-attendee">
-                    <SelectValue placeholder="Add attendee..." />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {members
