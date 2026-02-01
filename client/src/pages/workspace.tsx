@@ -1560,17 +1560,18 @@ export default function WorkspacePage() {
                   })}
                 </div>
                 <Select
-                  value=""
+                  value="__add__"
                   onValueChange={(v) => {
-                    if (!selectedEvent.attendeeIds.includes(v)) {
+                    if (v !== "__add__" && !selectedEvent.attendeeIds.includes(v)) {
                       setSelectedEvent({ ...selectedEvent, attendeeIds: [...selectedEvent.attendeeIds, v] });
                     }
                   }}
                 >
                   <SelectTrigger data-testid="select-add-attendee">
-                    <SelectValue />
+                    <SelectValue placeholder="Add attendee" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="__add__" className="text-muted-foreground">Add attendee...</SelectItem>
                     {members
                       .filter((m) => !selectedEvent.attendeeIds.includes(m.id))
                       .map((m) => (
