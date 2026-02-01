@@ -1023,11 +1023,11 @@ export default function WorkspacePage() {
 
   const deleteProjectMutation = useMutation({
     mutationFn: (id: string) => api.projects.delete(id),
-    onSuccess: () => {
+    onSuccess: (_data, deletedId) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       setEditingProject(null);
-      if (selectedProject === id) setSelectedProject(null);
+      if (selectedProject === deletedId) setSelectedProject(null);
     },
   });
 
@@ -1507,7 +1507,7 @@ export default function WorkspacePage() {
                     >
                       <CalendarDays className="h-4 w-4" />
                       {selectedTask.due && (
-                        <span className="ml-2">{format(new Date(selectedTask.due), "PPP")}</span>
+                        <span className="ml-2">{format(new Date(selectedTask.due), "MMMM d, yyyy")}</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -1515,13 +1515,38 @@ export default function WorkspacePage() {
                     <Calendar
                       mode="single"
                       selected={selectedTask.due ? new Date(selectedTask.due) : undefined}
-                      onSelect={(date) =>
-                        setSelectedTask({ ...selectedTask, due: date || null })
-                      }
+                      onSelect={(date) => {
+                        if (date && selectedTask.due) {
+                          const existing = new Date(selectedTask.due);
+                          date.setHours(existing.getHours(), existing.getMinutes());
+                        }
+                        setSelectedTask({ ...selectedTask, due: date || null });
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
                 </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label>Time</Label>
+                <Input
+                  type="time"
+                  value={selectedTask.due ? format(new Date(selectedTask.due), "HH:mm") : ""}
+                  onChange={(e) => {
+                    if (e.target.value && selectedTask.due) {
+                      const [hours, minutes] = e.target.value.split(":").map(Number);
+                      const newDate = new Date(selectedTask.due);
+                      newDate.setHours(hours, minutes);
+                      setSelectedTask({ ...selectedTask, due: newDate });
+                    } else if (e.target.value && !selectedTask.due) {
+                      const [hours, minutes] = e.target.value.split(":").map(Number);
+                      const newDate = new Date();
+                      newDate.setHours(hours, minutes, 0, 0);
+                      setSelectedTask({ ...selectedTask, due: newDate });
+                    }
+                  }}
+                  data-testid="input-task-time"
+                />
               </div>
               <div className="flex justify-between gap-2 pt-2">
                 {!isNewTask && (
@@ -1663,11 +1688,33 @@ export default function WorkspacePage() {
                     <Calendar
                       mode="single"
                       selected={selectedEvent.start ? new Date(selectedEvent.start) : undefined}
-                      onSelect={(date) => date && setSelectedEvent({ ...selectedEvent, start: date })}
+                      onSelect={(date) => {
+                        if (date) {
+                          const existing = new Date(selectedEvent.start);
+                          date.setHours(existing.getHours(), existing.getMinutes());
+                          setSelectedEvent({ ...selectedEvent, start: date });
+                        }
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
                 </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label>Time</Label>
+                <Input
+                  type="time"
+                  value={format(new Date(selectedEvent.start), "HH:mm")}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      const [hours, minutes] = e.target.value.split(":").map(Number);
+                      const newDate = new Date(selectedEvent.start);
+                      newDate.setHours(hours, minutes);
+                      setSelectedEvent({ ...selectedEvent, start: newDate });
+                    }
+                  }}
+                  data-testid="input-event-time"
+                />
               </div>
               <div className="flex justify-between gap-2 pt-2">
                 {!isNewEvent && (
