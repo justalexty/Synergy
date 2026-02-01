@@ -57,7 +57,6 @@ export default function LoginPage({ onAuthenticated }: Props) {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background crt">
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--accent)/0.08),transparent_70%)] pointer-events-none" />
       <div className="fixed inset-0 opacity-[0.015] pointer-events-none grain" />
-
       <Card className="relative z-10 glass shadow-soft rounded-2xl p-8 max-w-md w-full mx-4 neon-accent">
         <div className="flex flex-col items-center text-center">
           <div
@@ -77,9 +76,7 @@ export default function LoginPage({ onAuthenticated }: Props) {
           <p
             className="text-sm text-muted-foreground mb-8"
             data-testid="text-app-tagline"
-          >
-            Team workflow + calendar workspace
-          </p>
+          >WORKFLOW TERMINAL</p>
 
           {status === "denied" ? (
             <div className="w-full">
@@ -139,7 +136,6 @@ export default function LoginPage({ onAuthenticated }: Props) {
           )}
         </div>
       </Card>
-
       <div className="fixed bottom-4 text-center text-xs text-muted-foreground/50">
         Wallet-gated access
       </div>
