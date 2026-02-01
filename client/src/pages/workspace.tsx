@@ -87,7 +87,7 @@ function priorityClass(p: string) {
     case "Medium":
       return "bg-[hsl(45_55%_91%)] text-[hsl(40_50%_38%)] border-[hsl(43_45%_78%)]";
     case "High":
-      return "bg-[hsl(355_60%_93%)] text-[hsl(352_50%_45%)] border-[hsl(354_45%_80%)]";
+      return "bg-[hsl(350_70%_95%)] text-[hsl(348_55%_48%)] border-[hsl(350_50%_85%)]";
   }
 }
 
