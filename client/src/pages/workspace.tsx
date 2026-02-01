@@ -764,7 +764,6 @@ export default function WorkspacePage() {
   return (
     <AppShell>
       <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} />
-
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
         <LeftRail 
           active={active} 
@@ -814,9 +813,7 @@ export default function WorkspacePage() {
                           A quick pulse across the team
                         </div>
                       </div>
-                      <Button variant="secondary" size="sm" data-testid="button-viewall">
-                        View all
-                      </Button>
+                      <Button variant="secondary" size="sm" data-testid="button-viewall">View All</Button>
                     </div>
                     <Separator className="my-3" />
                     <div className="space-y-2">
@@ -935,7 +932,6 @@ export default function WorkspacePage() {
           </div>
         </div>
       </div>
-
       {/* Task Detail Dialog */}
       <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
         <DialogContent className="sm:max-w-[500px]">
@@ -1031,7 +1027,6 @@ export default function WorkspacePage() {
           )}
         </DialogContent>
       </Dialog>
-
       {/* Event Detail Dialog */}
       <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
         <DialogContent className="sm:max-w-[500px]">
