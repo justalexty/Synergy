@@ -1224,7 +1224,7 @@ export default function WorkspacePage() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <MetricCard 
-                    label="This week" 
+                    label="This Week" 
                     value={String(thisWeekTasks.length)} 
                     hint="items scheduled" 
                     selected={metricFilter === "week"}
