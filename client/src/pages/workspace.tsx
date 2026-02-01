@@ -1221,9 +1221,7 @@ export default function WorkspacePage() {
                     <div className="font-display text-2xl font-[720] tracking-[-0.03em]" data-testid="text-calendar-title">
                       {format(month, "MMMM yyyy")}
                     </div>
-                    <div className="text-xs text-muted-foreground" data-testid="text-calendar-subtitle">
-                      Click a day to see agenda. Create adds a task due that day.
-                    </div>
+                    <div className="text-xs text-muted-foreground" data-testid="text-calendar-subtitle">Click a day to see agenda.</div>
                   </div>
 
                   <div className="flex items-center gap-2">
