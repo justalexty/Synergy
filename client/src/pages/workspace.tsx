@@ -31,7 +31,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WalletConnectLogin from "@/components/walletconnect-login";
+import WalletConnectButton from "@/components/walletconnect-button";
 import { cn } from "@/lib/utils";
 
 type Status = "todo" | "in_progress" | "blocked" | "done";
@@ -262,6 +262,7 @@ function TopBar({
         </div>
 
         <div className="flex items-center gap-2">
+          <WalletConnectButton onConnected={() => {}} />
           <Button
             variant="secondary"
             className="hidden sm:inline-flex"
@@ -782,11 +783,6 @@ export default function WorkspacePage() {
   return (
     <AppShell>
       <TopBar query={query} setQuery={setQuery} onCreate={onCreate} />
-
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_420px]">
-        <div className="min-w-0" />
-        <WalletConnectLogin onConnected={() => {}} />
-      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
         <LeftRail active={active} setActive={setActive} />
