@@ -237,7 +237,7 @@ function TopBar({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tasks, docs, events…"
+            placeholder="Search tasks, meetings…"
             className="border-0 bg-transparent pl-1 pr-0 focus-visible:ring-0"
             data-testid="input-search"
           />
@@ -572,13 +572,9 @@ function MonthGrid({
                     key={item.id}
                     className={cn(
                       "truncate rounded-md px-2 py-1 text-[11px]",
-                      item.color === "primary"
-                        ? "bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))]"
-                        : item.color === "accent"
-                          ? "bg-[hsl(var(--accent)/0.14)] text-[hsl(var(--accent))]"
-                          : item.color === "task"
-                            ? "bg-[hsl(355_45%_95%)] text-[hsl(var(--foreground))]"
-                            : "bg-muted text-muted-foreground",
+                      item.type === "task"
+                        ? "bg-[hsl(355_45%_95%)] text-[hsl(var(--foreground))]"
+                        : "bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))]",
                     )}
                     data-testid={`pill-${item.type}-${item.id}`}
                   >
@@ -642,7 +638,7 @@ function DayAgenda({
       <div className="space-y-2">
         {eventsForDay.length === 0 && tasksForDay.length === 0 ? (
           <div className="rounded-xl border bg-card/60 p-3 text-sm text-muted-foreground" data-testid="empty-agenda">
-            Nothing scheduled. Pick a day with tasks/events or create one.
+            Nothing scheduled. Pick a day with tasks or meetings.
           </div>
         ) : null}
 
@@ -663,16 +659,10 @@ function DayAgenda({
             </div>
             <Badge
               variant="secondary"
-              className={cn(
-                e.color === "primary"
-                  ? "bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))]"
-                  : e.color === "accent"
-                    ? "bg-[hsl(var(--accent)/0.14)] text-[hsl(var(--accent))]"
-                    : "bg-muted text-muted-foreground",
-              )}
-              data-testid={`badge-eventcolor-${e.id}`}
+              className="bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))]"
+              data-testid={`badge-meeting-${e.id}`}
             >
-              {e.color}
+              Meeting
             </Badge>
           </button>
         ))}
@@ -849,7 +839,7 @@ export default function WorkspacePage() {
     if (members.length < 2) return;
     
     createEventMutation.mutate({
-      title: "New event",
+      title: "New meeting",
       start: selected,
       end: null,
       color: "primary",
@@ -987,7 +977,7 @@ export default function WorkspacePage() {
                       data-testid="button-add-event"
                     >
                       <Plus className="mr-2 h-4 w-4" />
-                      Event
+                      Meeting
                     </Button>
                   </div>
                 </div>
@@ -1247,7 +1237,7 @@ export default function WorkspacePage() {
       <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Event</DialogTitle>
+            <DialogTitle>Edit Meeting</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
             <div className="space-y-4 pt-2">
@@ -1258,22 +1248,6 @@ export default function WorkspacePage() {
                   onChange={(e) => setSelectedEvent({ ...selectedEvent, title: e.target.value })}
                   data-testid="input-event-title"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label>Color</Label>
-                <Select
-                  value={selectedEvent.color}
-                  onValueChange={(v) => setSelectedEvent({ ...selectedEvent, color: v })}
-                >
-                  <SelectTrigger data-testid="select-event-color">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="primary">Primary</SelectItem>
-                    <SelectItem value="accent">Accent</SelectItem>
-                    <SelectItem value="muted">Muted</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Attendees</Label>
@@ -1353,7 +1327,6 @@ export default function WorkspacePage() {
                         id: selectedEvent.id,
                         data: {
                           title: selectedEvent.title,
-                          color: selectedEvent.color,
                           attendeeIds: selectedEvent.attendeeIds,
                         },
                       });
