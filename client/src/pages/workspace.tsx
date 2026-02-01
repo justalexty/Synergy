@@ -24,6 +24,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Filter,
   Handshake,
   LayoutGrid,
   Pencil,
@@ -249,17 +250,44 @@ function TeamPanel({ members }: { members: Member[] }) {
   );
 }
 
+type Filters = {
+  status: string[];
+  priority: string[];
+  projectId: string | null;
+  assigneeId: string | null;
+};
+
 function TopBar({
   query,
   setQuery,
   onCreate,
   members,
+  projects,
+  filters,
+  setFilters,
 }: {
   query: string;
   setQuery: (v: string) => void;
   onCreate: () => void;
   members: Member[];
+  projects: Project[];
+  filters: Filters;
+  setFilters: (f: Filters) => void;
 }) {
+  const hasActiveFilters = filters.status.length > 0 || filters.priority.length > 0 || filters.projectId || filters.assigneeId;
+  const toggleStatus = (s: string) => {
+    setFilters({
+      ...filters,
+      status: filters.status.includes(s) ? filters.status.filter((x) => x !== s) : [...filters.status, s],
+    });
+  };
+  const togglePriority = (p: string) => {
+    setFilters({
+      ...filters,
+      priority: filters.priority.includes(p) ? filters.priority.filter((x) => x !== p) : [...filters.priority, p],
+    });
+  };
+  const clearFilters = () => setFilters({ status: [], priority: [], projectId: null, assigneeId: null });
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
@@ -309,6 +337,108 @@ function TopBar({
           />
         </div>
 
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={hasActiveFilters ? "default" : "secondary"}
+              className="hidden sm:inline-flex"
+              data-testid="button-filter"
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filters
+              {hasActiveFilters && (
+                <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+                  {filters.status.length + filters.priority.length + (filters.projectId ? 1 : 0) + (filters.assigneeId ? 1 : 0)}
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72" align="end">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-medium">Filters</div>
+                {hasActiveFilters && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="h-auto px-2 py-1 text-xs">
+                    Clear all
+                  </Button>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Status</Label>
+                <div className="flex flex-wrap gap-1">
+                  {(["todo", "in_progress", "blocked", "done"] as const).map((s) => (
+                    <Button
+                      key={s}
+                      variant={filters.status.includes(s) ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => toggleStatus(s)}
+                      data-testid={`filter-status-${s}`}
+                    >
+                      {statusLabel[s]}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Priority</Label>
+                <div className="flex flex-wrap gap-1">
+                  {["High", "Medium", "Low"].map((p) => (
+                    <Button
+                      key={p}
+                      variant={filters.priority.includes(p) ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => togglePriority(p)}
+                      data-testid={`filter-priority-${p}`}
+                    >
+                      {p}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Project</Label>
+                <Select
+                  value={filters.projectId ?? ""}
+                  onValueChange={(v) => setFilters({ ...filters, projectId: v || null })}
+                >
+                  <SelectTrigger className="h-8" data-testid="filter-project">
+                    <SelectValue placeholder="Any project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Any project</SelectItem>
+                    {projects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Assignee</Label>
+                <Select
+                  value={filters.assigneeId ?? ""}
+                  onValueChange={(v) => setFilters({ ...filters, assigneeId: v || null })}
+                >
+                  <SelectTrigger className="h-8" data-testid="filter-assignee">
+                    <SelectValue placeholder="Anyone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Anyone</SelectItem>
+                    {members.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        <div className="flex items-center gap-2">
+                          <div className={cn("h-4 w-4 rounded-full border bg-gradient-to-br", m.color)} />
+                          {m.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
         <TeamPanel members={members} />
       </div>
     </div>
@@ -805,6 +935,12 @@ export default function WorkspacePage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [metricFilter, setMetricFilter] = useState<"week" | "progress" | "focus" | null>(null);
+  const [filters, setFilters] = useState<{
+    status: string[];
+    priority: string[];
+    projectId: string | null;
+    assigneeId: string | null;
+  }>({ status: [], priority: [], projectId: null, assigneeId: null });
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -939,6 +1075,20 @@ export default function WorkspacePage() {
     if (selectedProject) {
       result = result.filter((t) => t.projectId === selectedProject);
     }
+
+    if (filters.status.length > 0) {
+      result = result.filter((t) => filters.status.includes(t.status));
+    }
+    if (filters.priority.length > 0) {
+      result = result.filter((t) => filters.priority.includes(t.priority));
+    }
+    if (filters.projectId) {
+      result = result.filter((t) => t.projectId === filters.projectId);
+    }
+    if (filters.assigneeId) {
+      result = result.filter((t) => t.assigneeIds.includes(filters.assigneeId!));
+    }
+
     const q = query.trim().toLowerCase();
     if (!q) return result;
     return result.filter((t) => {
@@ -950,7 +1100,7 @@ export default function WorkspacePage() {
         p.toLowerCase().includes(q)
       );
     });
-  }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects]);
+  }, [query, tasks, projects, selectedProject, metricFilter, thisWeekTasks, inProgressTasks, activeProjects, filters]);
 
   function onCreate() {
     createTaskMutation.mutate({
@@ -986,7 +1136,7 @@ export default function WorkspacePage() {
 
   return (
     <AppShell>
-      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} />
+      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} projects={projects} filters={filters} setFilters={setFilters} />
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
         <LeftRail 
           active={active} 
