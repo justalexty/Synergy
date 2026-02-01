@@ -52,11 +52,11 @@ export default function WalletConnectButton({ onConnected }: Props) {
     >
       <Wallet className="mr-2 h-4 w-4" />
       {status === "connected"
-        ? "Wallet Connected"
+        ? "Logged In"
         : status === "connecting"
           ? "Connecting…"
           : canConnect
-            ? "Connect Wallet"
+            ? "Log In"
             : "No Wallet"}
     </Button>
   );
