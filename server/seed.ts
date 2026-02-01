@@ -16,23 +16,23 @@ async function seed() {
     .insert(members)
     .values([
       {
-        name: "Ava Park",
-        handle: "@ava",
+        name: "Vid",
+        handle: "@vid",
         color: "from-rose-400/40 to-pink-300/40",
       },
       {
-        name: "Noah Kim",
-        handle: "@noah",
+        name: "Joseph",
+        handle: "@joseph",
         color: "from-red-800/50 to-rose-700/45",
       },
       {
-        name: "Mina Chen",
-        handle: "@mina",
+        name: "George",
+        handle: "@george",
         color: "from-amber-700/40 to-red-600/40",
       },
       {
-        name: "Omar Ali",
-        handle: "@omar",
+        name: "Alex",
+        handle: "@alex",
         color: "from-rose-600/45 to-red-500/40",
       },
     ])
