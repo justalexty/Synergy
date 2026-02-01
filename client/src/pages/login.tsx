@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Handshake, Wallet, ShieldX } from "lucide-react";
-import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { BrowserProvider } from "ethers";
+import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -14,14 +13,16 @@ type Props = {
 export default function LoginPage({ onAuthenticated }: Props) {
   const [status, setStatus] = useState<"idle" | "connecting" | "verifying" | "denied">("idle");
   const [error, setError] = useState<string | null>(null);
+  const pendingVerification = useRef(false);
   
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
-  const { walletProvider } = useAppKitProvider("eip155");
+  const { disconnect } = useDisconnect();
 
   useEffect(() => {
     async function verifyWallet() {
-      if (isConnected && address && status === "connecting") {
+      if (isConnected && address && pendingVerification.current) {
+        pendingVerification.current = false;
         setStatus("verifying");
         setError(null);
 
@@ -47,22 +48,52 @@ export default function LoginPage({ onAuthenticated }: Props) {
     }
 
     verifyWallet();
-  }, [isConnected, address, status, onAuthenticated]);
+  }, [isConnected, address, onAuthenticated]);
 
   async function handleLogin() {
     setStatus("connecting");
     setError(null);
+    pendingVerification.current = true;
+
+    if (isConnected && address) {
+      setStatus("verifying");
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ walletAddress: address }),
+        });
+
+        const data = await res.json();
+
+        if (data.authorized) {
+          onAuthenticated(address, data.userName);
+        } else {
+          setStatus("denied");
+        }
+      } catch (err: any) {
+        setError(err?.message || "Verification failed");
+        setStatus("idle");
+      }
+      return;
+    }
+
     try {
       await open();
     } catch (err: any) {
       setError(err?.message || "Connection failed");
       setStatus("idle");
+      pendingVerification.current = false;
     }
   }
 
-  function handleTryAgain() {
+  async function handleTryAgain() {
+    try {
+      await disconnect();
+    } catch {}
     setStatus("idle");
     setError(null);
+    pendingVerification.current = false;
   }
 
   return (
