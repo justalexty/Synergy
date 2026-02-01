@@ -65,8 +65,8 @@
   --popover: 42 40% 98%;
   --popover-foreground: 15 45% 22%;
 
-  /* Deep plum/burgundy primary - wine bar vibes */
-  --primary: 345 42% 38%;
+  /* Warm plum/burgundy primary - wine bar vibes */
+  --primary: 338 48% 36%;
   --primary-foreground: 0 0% 100%;
 
   /* Warm beige secondary */
@@ -90,7 +90,7 @@
   --ring: 350 35% 58%;
 
   /* Wine-inspired chart palette */
-  --chart-1: 345 42% 38%;
+  --chart-1: 338 48% 36%;
   --chart-2: 350 45% 65%;
   --chart-3: 18 50% 55%;
   --chart-4: 42 55% 65%;
@@ -99,7 +99,7 @@
   --sidebar: 40 28% 95%;
   --sidebar-foreground: 15 45% 22%;
   --sidebar-border: 35 18% 82%;
-  --sidebar-primary: 345 42% 38%;
+  --sidebar-primary: 338 48% 36%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 38 25% 90%;
   --sidebar-accent-foreground: 15 45% 22%;
@@ -127,7 +127,7 @@
   --popover: 30 16% 13%;
   --popover-foreground: 40 25% 90%;
 
-  --primary: 345 50% 55%;
+  --primary: 338 55% 52%;
   --primary-foreground: 30 18% 10%;
 
   --secondary: 30 14% 18%;
@@ -149,7 +149,7 @@
   --sidebar: 30 16% 12%;
   --sidebar-foreground: 40 25% 90%;
   --sidebar-border: 30 12% 22%;
-  --sidebar-primary: 345 50% 55%;
+  --sidebar-primary: 338 55% 52%;
   --sidebar-primary-foreground: 30 18% 10%;
   --sidebar-accent: 30 14% 18%;
   --sidebar-accent-foreground: 40 25% 90%;
