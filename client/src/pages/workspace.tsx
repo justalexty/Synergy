@@ -684,7 +684,7 @@ function MonthGrid({
                     )}
                     data-testid={`pill-${item.type}-${item.id}`}
                   >
-                    {item.type === "task" ? "📋 " : ""}{item.title}
+                    {item.title}
                   </div>
                 ))}
                 {dayItems.length > 2 ? (
