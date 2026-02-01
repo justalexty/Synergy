@@ -110,7 +110,7 @@ function ProjectForm({
   onCancel: () => void;
 }) {
   const [name, setName] = useState(project?.name || "");
-  const [emoji, setEmoji] = useState(project?.emoji || "🚀");
+  const [emoji, setEmoji] = useState(project?.emoji || "✦");
 
   return (
     <div className="space-y-4">
@@ -1248,7 +1248,7 @@ export default function WorkspacePage() {
                   <SelectContent>
                     {projects.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.emoji} {p.name}
+                        {p.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
