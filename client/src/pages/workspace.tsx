@@ -388,7 +388,10 @@ function TaskRow({
             {statusLabel[t.status as Status]}
           </div>
           <div
-            className="rounded-md border px-2 py-0.5 text-xs bg-[hsl(355_45%_95%)] border-[hsl(354_35%_85%)] text-[#ff7d8f]"
+            className={cn(
+              "rounded-md border px-2 py-0.5 text-xs",
+              priorityClass(t.priority),
+            )}
             data-testid={`badge-priority-${t.id}`}
           >
             {t.priority}
