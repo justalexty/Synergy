@@ -28,7 +28,6 @@ import {
   LayoutGrid,
   Plus,
   Search,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -124,10 +123,7 @@ function TopBar({
               className="grid h-9 w-9 place-items-center rounded-xl border bg-card/70 shadow-soft neon-ring"
               data-testid="badge-brand"
             >
-              <Sparkles
-                className="h-4 w-4 text-[hsl(var(--primary))] text-neon"
-                strokeWidth={2.4}
-              />
+              <span className="text-base" aria-hidden>🤝</span>
             </div>
             <div className="min-w-0">
               <div
