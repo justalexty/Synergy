@@ -378,14 +378,14 @@ function TopBar({
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">Project</Label>
                   <Select
-                    value={filters.projectId ?? ""}
-                    onValueChange={(v) => setFilters({ ...filters, projectId: v || null })}
+                    value={filters.projectId ?? "__any__"}
+                    onValueChange={(v) => setFilters({ ...filters, projectId: v === "__any__" ? null : v })}
                   >
                     <SelectTrigger className="h-8" data-testid="filter-project">
                       <SelectValue placeholder="Any project" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any project</SelectItem>
+                      <SelectItem value="__any__">Any project</SelectItem>
                       {projects.map((p) => (
                         <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                       ))}
@@ -395,14 +395,14 @@ function TopBar({
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">Assignee</Label>
                   <Select
-                    value={filters.assigneeId ?? ""}
-                    onValueChange={(v) => setFilters({ ...filters, assigneeId: v || null })}
+                    value={filters.assigneeId ?? "__any__"}
+                    onValueChange={(v) => setFilters({ ...filters, assigneeId: v === "__any__" ? null : v })}
                   >
                     <SelectTrigger className="h-8" data-testid="filter-assignee">
                       <SelectValue placeholder="Anyone" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Anyone</SelectItem>
+                      <SelectItem value="__any__">Anyone</SelectItem>
                       {members.map((m) => (
                         <SelectItem key={m.id} value={m.id}>
                           <div className="flex items-center gap-2">
