@@ -32,6 +32,20 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import WalletConnectButton from "@/components/walletconnect-button";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -189,11 +203,15 @@ function LeftRail({
   setActive,
   projects,
   tasks,
+  selectedProject,
+  onSelectProject,
 }: {
   active: "overview" | "calendar" | "tasks";
   setActive: (v: "overview" | "calendar" | "tasks") => void;
   projects: Project[];
   tasks: Task[];
+  selectedProject: string | null;
+  onSelectProject: (id: string | null) => void;
 }) {
   const taskCountByProject = useMemo(() => {
     const counts = new Map<string, number>();
@@ -255,9 +273,13 @@ function LeftRail({
       </div>
       <div className="mt-2 flex flex-col gap-1">
         {projects.map((p) => (
-          <div
+          <button
             key={p.id}
-            className="flex items-center justify-between rounded-xl px-2 py-2 hover:bg-[hsl(var(--foreground)/0.03)]"
+            className={cn(
+              "flex w-full items-center justify-between rounded-xl px-2 py-2 text-left transition-colors hover:bg-[hsl(var(--foreground)/0.05)]",
+              selectedProject === p.id && "bg-primary/10 ring-1 ring-primary/30"
+            )}
+            onClick={() => onSelectProject(selectedProject === p.id ? null : p.id)}
             data-testid={`row-project-${p.id}`}
           >
             <div className="flex items-center gap-2">
@@ -276,7 +298,7 @@ function LeftRail({
             <Badge variant="secondary" data-testid={`badge-count-${p.id}`}>
               {taskCountByProject.get(p.id) || 0}
             </Badge>
-          </div>
+          </button>
         ))}
       </div>
 
@@ -336,15 +358,18 @@ function TaskRow({
   t,
   membersMap,
   projects,
+  onClick,
 }: {
   t: Task;
   membersMap: Map<string, Member>;
   projects: Project[];
+  onClick?: () => void;
 }) {
   const p = projects.find((x) => x.id === t.projectId);
   return (
-    <div
-      className="group flex items-center justify-between gap-4 rounded-xl border bg-card/70 px-3 py-3 shadow-soft transition hover:-translate-y-[1px] hover:shadow-float"
+    <button
+      className="group flex w-full items-center justify-between gap-4 rounded-xl border bg-card/70 px-3 py-3 shadow-soft text-left transition hover:-translate-y-[1px] hover:shadow-float cursor-pointer"
+      onClick={onClick}
       data-testid={`row-task-${t.id}`}
     >
       <div className="min-w-0">
@@ -402,7 +427,7 @@ function TaskRow({
           })}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -517,7 +542,19 @@ function MonthGrid({
   );
 }
 
-function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[]; events: Event[] }) {
+function DayAgenda({ 
+  selected, 
+  tasks, 
+  events,
+  onTaskClick,
+  onEventClick,
+}: { 
+  selected: Date; 
+  tasks: Task[]; 
+  events: Event[];
+  onTaskClick?: (t: Task) => void;
+  onEventClick?: (e: Event) => void;
+}) {
   const tasksForDay = tasks
     .filter((t) => t.due && isSameDay(t.due, selected))
     .slice(0, 6);
@@ -553,9 +590,10 @@ function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[];
         ) : null}
 
         {eventsForDay.map((e) => (
-          <div
+          <button
             key={e.id}
-            className="flex items-center justify-between rounded-xl border bg-card/60 px-3 py-2"
+            className="flex w-full items-center justify-between rounded-xl border bg-card/60 px-3 py-2 text-left cursor-pointer hover:bg-card/80 transition-colors"
+            onClick={() => onEventClick?.(e)}
             data-testid={`row-event-${e.id}`}
           >
             <div className="min-w-0">
@@ -579,13 +617,14 @@ function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[];
             >
               {e.color}
             </Badge>
-          </div>
+          </button>
         ))}
 
         {tasksForDay.map((t) => (
-          <div
+          <button
             key={t.id}
-            className="flex items-center justify-between rounded-xl border bg-card/60 px-3 py-2"
+            className="flex w-full items-center justify-between rounded-xl border bg-card/60 px-3 py-2 text-left cursor-pointer hover:bg-card/80 transition-colors"
+            onClick={() => onTaskClick?.(t)}
             data-testid={`row-agendatask-${t.id}`}
           >
             <div className="min-w-0">
@@ -599,7 +638,7 @@ function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[];
             <div className={cn("rounded-md border px-2 py-0.5 text-xs", statusClass(t.status as Status))} data-testid={`badge-agendastatus-${t.id}`}>
               {statusLabel[t.status as Status]}
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </Card>
@@ -614,6 +653,9 @@ export default function WorkspacePage() {
   const [query, setQuery] = useState("");
   const [month, setMonth] = useState(() => new Date());
   const [selected, setSelected] = useState(() => new Date());
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const { data: members = [] } = useQuery({
     queryKey: ["members"],
@@ -649,14 +691,34 @@ export default function WorkspacePage() {
     },
   });
 
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Task> }) =>
+      api.tasks.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  const updateEventMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Event> }) =>
+      api.events.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+
   const membersMap = useMemo(() => {
     return new Map(members.map((m) => [m.id, m] as const));
   }, [members]);
 
   const filteredTasks = useMemo(() => {
+    let result = tasks;
+    if (selectedProject) {
+      result = result.filter((t) => t.projectId === selectedProject);
+    }
     const q = query.trim().toLowerCase();
-    if (!q) return tasks;
-    return tasks.filter((t) => {
+    if (!q) return result;
+    return result.filter((t) => {
       const p = projects.find((x) => x.id === t.projectId)?.name ?? "";
       return (
         t.title.toLowerCase().includes(q) ||
@@ -665,7 +727,7 @@ export default function WorkspacePage() {
         p.toLowerCase().includes(q)
       );
     });
-  }, [query, tasks, projects]);
+  }, [query, tasks, projects, selectedProject]);
 
   function onCreate() {
     if (projects.length === 0 || members.length === 0) return;
@@ -686,6 +748,7 @@ export default function WorkspacePage() {
     createEventMutation.mutate({
       title: "New event",
       start: selected,
+      end: null,
       color: "primary",
       attendeeIds: [members[0].id, members[1].id],
     });
@@ -696,7 +759,14 @@ export default function WorkspacePage() {
       <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} />
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
-        <LeftRail active={active} setActive={setActive} projects={projects} tasks={tasks} />
+        <LeftRail 
+          active={active} 
+          setActive={setActive} 
+          projects={projects} 
+          tasks={tasks}
+          selectedProject={selectedProject}
+          onSelectProject={setSelectedProject}
+        />
 
         <div className="min-w-0">
           <Tabs
@@ -744,12 +814,12 @@ export default function WorkspacePage() {
                     <Separator className="my-3" />
                     <div className="space-y-2">
                       {filteredTasks.slice(0, 5).map((t) => (
-                        <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} />
+                        <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} onClick={() => setSelectedTask(t)} />
                       ))}
                     </div>
                   </Card>
 
-                  <DayAgenda selected={selected} tasks={tasks} events={events} />
+                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} />
                 </div>
               </div>
             ) : null}
@@ -811,7 +881,7 @@ export default function WorkspacePage() {
                     onSelect={setSelected}
                     events={events}
                   />
-                  <DayAgenda selected={selected} tasks={tasks} events={events} />
+                  <DayAgenda selected={selected} tasks={tasks} events={events} onTaskClick={setSelectedTask} onEventClick={setSelectedEvent} />
                 </div>
               </div>
             ) : null}
@@ -850,7 +920,7 @@ export default function WorkspacePage() {
 
                 <div className="space-y-2">
                   {filteredTasks.map((t) => (
-                    <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} />
+                    <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} onClick={() => setSelectedTask(t)} />
                   ))}
                 </div>
               </div>
@@ -858,6 +928,159 @@ export default function WorkspacePage() {
           </div>
         </div>
       </div>
+
+      {/* Task Detail Dialog */}
+      <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+          </DialogHeader>
+          {selectedTask && (
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input
+                  value={selectedTask.title}
+                  onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
+                  data-testid="input-task-title"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select
+                    value={selectedTask.status}
+                    onValueChange={(v) => setSelectedTask({ ...selectedTask, status: v })}
+                  >
+                    <SelectTrigger data-testid="select-task-status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todo">To do</SelectItem>
+                      <SelectItem value="in_progress">In progress</SelectItem>
+                      <SelectItem value="blocked">Blocked</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Priority</Label>
+                  <Select
+                    value={selectedTask.priority}
+                    onValueChange={(v) => setSelectedTask({ ...selectedTask, priority: v })}
+                  >
+                    <SelectTrigger data-testid="select-task-priority">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Project</Label>
+                <Select
+                  value={selectedTask.projectId}
+                  onValueChange={(v) => setSelectedTask({ ...selectedTask, projectId: v })}
+                >
+                  <SelectTrigger data-testid="select-task-project">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.emoji} {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="secondary" onClick={() => setSelectedTask(null)} data-testid="button-cancel-task">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    updateTaskMutation.mutate({
+                      id: selectedTask.id,
+                      data: {
+                        title: selectedTask.title,
+                        status: selectedTask.status,
+                        priority: selectedTask.priority,
+                        projectId: selectedTask.projectId,
+                      },
+                    });
+                    setSelectedTask(null);
+                  }}
+                  data-testid="button-save-task"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Event Detail Dialog */}
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input
+                  value={selectedEvent.title}
+                  onChange={(e) => setSelectedEvent({ ...selectedEvent, title: e.target.value })}
+                  data-testid="input-event-title"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Color</Label>
+                <Select
+                  value={selectedEvent.color}
+                  onValueChange={(v) => setSelectedEvent({ ...selectedEvent, color: v })}
+                >
+                  <SelectTrigger data-testid="select-event-color">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="primary">Primary</SelectItem>
+                    <SelectItem value="accent">Accent</SelectItem>
+                    <SelectItem value="muted">Muted</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="secondary" onClick={() => setSelectedEvent(null)} data-testid="button-cancel-event">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    updateEventMutation.mutate({
+                      id: selectedEvent.id,
+                      data: {
+                        title: selectedEvent.title,
+                        color: selectedEvent.color,
+                      },
+                    });
+                    setSelectedEvent(null);
+                  }}
+                  data-testid="button-save-event"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
