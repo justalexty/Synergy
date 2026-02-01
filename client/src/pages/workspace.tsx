@@ -24,6 +24,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,73 +34,10 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WalletConnectButton from "@/components/walletconnect-button";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import type { Member, Project, Task, Event } from "@shared/schema";
 
 type Status = "todo" | "in_progress" | "blocked" | "done";
-
-type Member = {
-  id: string;
-  name: string;
-  handle: string;
-  color: string;
-};
-
-type Project = {
-  id: string;
-  name: string;
-  emoji: string;
-};
-
-type Task = {
-  id: string;
-  title: string;
-  status: Status;
-  projectId: string;
-  assigneeIds: string[];
-  due: Date | null;
-  priority: "Low" | "Medium" | "High";
-};
-
-type Event = {
-  id: string;
-  title: string;
-  start: Date;
-  end?: Date;
-  color: "primary" | "accent" | "muted";
-  attendees: string[];
-};
-
-const members: Member[] = [
-  {
-    id: "m1",
-    name: "Ava Park",
-    handle: "@ava",
-    color: "from-violet-500/20 to-indigo-500/20",
-  },
-  {
-    id: "m2",
-    name: "Noah Kim",
-    handle: "@noah",
-    color: "from-cyan-500/18 to-sky-500/18",
-  },
-  {
-    id: "m3",
-    name: "Mina Chen",
-    handle: "@mina",
-    color: "from-emerald-500/18 to-lime-500/18",
-  },
-  {
-    id: "m4",
-    name: "Omar Ali",
-    handle: "@omar",
-    color: "from-fuchsia-500/18 to-pink-500/18",
-  },
-];
-
-const projects: Project[] = [
-  { id: "p1", name: "Website Revamp", emoji: "✦" },
-  { id: "p2", name: "Mobile App", emoji: "◈" },
-  { id: "p3", name: "Ops & Hiring", emoji: "◌" },
-];
 
 const statusLabel: Record<Status, string> = {
   todo: "To do",
@@ -121,7 +59,7 @@ function statusClass(s: Status) {
   }
 }
 
-function priorityClass(p: Task["priority"]) {
+function priorityClass(p: string) {
   switch (p) {
     case "Low":
       return "bg-muted text-muted-foreground border-border";
@@ -131,82 +69,6 @@ function priorityClass(p: Task["priority"]) {
       return "bg-[hsl(var(--destructive)/0.10)] text-[hsl(var(--destructive))] border-[hsl(var(--destructive)/0.25)]";
   }
 }
-
-function membersById() {
-  return new Map(members.map((m) => [m.id, m] as const));
-}
-
-const initialTasks: Task[] = [
-  {
-    id: "t1",
-    title: "Finalize IA + nav structure",
-    status: "in_progress",
-    projectId: "p1",
-    assigneeIds: ["m1", "m2"],
-    due: addDays(new Date(), 3),
-    priority: "High",
-  },
-  {
-    id: "t2",
-    title: "Write spec for recurring events",
-    status: "todo",
-    projectId: "p2",
-    assigneeIds: ["m3"],
-    due: addDays(new Date(), 7),
-    priority: "Medium",
-  },
-  {
-    id: "t3",
-    title: "Hiring pipeline: stage definitions",
-    status: "todo",
-    projectId: "p3",
-    assigneeIds: ["m4"],
-    due: addDays(new Date(), 10),
-    priority: "Low",
-  },
-  {
-    id: "t4",
-    title: "QA: calendar drag interactions",
-    status: "blocked",
-    projectId: "p2",
-    assigneeIds: ["m2"],
-    due: addDays(new Date(), 5),
-    priority: "High",
-  },
-  {
-    id: "t5",
-    title: "Design tokens pass",
-    status: "done",
-    projectId: "p1",
-    assigneeIds: ["m1", "m3"],
-    due: addDays(new Date(), -2),
-    priority: "Medium",
-  },
-];
-
-const initialEvents: Event[] = [
-  {
-    id: "e1",
-    title: "Weekly planning",
-    start: addDays(new Date(), 1),
-    color: "primary",
-    attendees: ["m1", "m2", "m3"],
-  },
-  {
-    id: "e2",
-    title: "Design review",
-    start: addDays(new Date(), 2),
-    color: "accent",
-    attendees: ["m1", "m4"],
-  },
-  {
-    id: "e3",
-    title: "Ship v0 notes",
-    start: addDays(new Date(), 4),
-    color: "muted",
-    attendees: ["m2"],
-  },
-];
 
 function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -225,10 +87,12 @@ function TopBar({
   query,
   setQuery,
   onCreate,
+  members,
 }: {
   query: string;
   setQuery: (v: string) => void;
   onCreate: () => void;
+  members: Member[];
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -323,10 +187,22 @@ function TopBar({
 function LeftRail({
   active,
   setActive,
+  projects,
+  tasks,
 }: {
   active: "overview" | "calendar" | "tasks";
   setActive: (v: "overview" | "calendar" | "tasks") => void;
+  projects: Project[];
+  tasks: Task[];
 }) {
+  const taskCountByProject = useMemo(() => {
+    const counts = new Map<string, number>();
+    tasks.forEach((t) => {
+      counts.set(t.projectId, (counts.get(t.projectId) || 0) + 1);
+    });
+    return counts;
+  }, [tasks]);
+
   return (
     <div className="glass shadow-soft sticky top-6 hidden h-[calc(100vh-3.5rem)] w-[240px] flex-col rounded-2xl p-3 lg:flex">
       <div className="mb-2 px-2 pt-2">
@@ -398,7 +274,7 @@ function LeftRail({
               </div>
             </div>
             <Badge variant="secondary" data-testid={`badge-count-${p.id}`}>
-              {Math.floor(2 + Math.random() * 7)}
+              {taskCountByProject.get(p.id) || 0}
             </Badge>
           </div>
         ))}
@@ -459,9 +335,11 @@ function MetricCard({
 function TaskRow({
   t,
   membersMap,
+  projects,
 }: {
   t: Task;
   membersMap: Map<string, Member>;
+  projects: Project[];
 }) {
   const p = projects.find((x) => x.id === t.projectId);
   return (
@@ -474,11 +352,11 @@ function TaskRow({
           <div
             className={cn(
               "rounded-md border px-2 py-0.5 text-xs",
-              statusClass(t.status),
+              statusClass(t.status as Status),
             )}
             data-testid={`badge-status-${t.id}`}
           >
-            {statusLabel[t.status]}
+            {statusLabel[t.status as Status]}
           </div>
           <div
             className={cn(
@@ -685,7 +563,7 @@ function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[];
                 {e.title}
               </div>
               <div className="text-xs text-muted-foreground" data-testid={`text-eventmeta-${e.id}`}>
-                {e.attendees.length} attendee{e.attendees.length === 1 ? "" : "s"}
+                {e.attendeeIds.length} attendee{e.attendeeIds.length === 1 ? "" : "s"}
               </div>
             </div>
             <Badge
@@ -715,11 +593,11 @@ function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[];
                 {t.title}
               </div>
               <div className="text-xs text-muted-foreground" data-testid={`text-agendataskmeta-${t.id}`}>
-                {statusLabel[t.status]} • {t.priority}
+                {statusLabel[t.status as Status]} • {t.priority}
               </div>
             </div>
-            <div className={cn("rounded-md border px-2 py-0.5 text-xs", statusClass(t.status))} data-testid={`badge-agendastatus-${t.id}`}>
-              {statusLabel[t.status]}
+            <div className={cn("rounded-md border px-2 py-0.5 text-xs", statusClass(t.status as Status))} data-testid={`badge-agendastatus-${t.id}`}>
+              {statusLabel[t.status as Status]}
             </div>
           </div>
         ))}
@@ -729,16 +607,51 @@ function DayAgenda({ selected, tasks, events }: { selected: Date; tasks: Task[];
 }
 
 export default function WorkspacePage() {
+  const queryClient = useQueryClient();
   const [active, setActive] = useState<"overview" | "calendar" | "tasks">(
     "overview",
   );
   const [query, setQuery] = useState("");
   const [month, setMonth] = useState(() => new Date());
   const [selected, setSelected] = useState(() => new Date());
-  const [tasks, setTasks] = useState<Task[]>(() => initialTasks);
-  const [events, setEvents] = useState<Event[]>(() => initialEvents);
 
-  const membersMap = useMemo(() => membersById(), []);
+  const { data: members = [] } = useQuery({
+    queryKey: ["members"],
+    queryFn: api.members.getAll,
+  });
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: api.projects.getAll,
+  });
+
+  const { data: tasks = [] } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: api.tasks.getAll,
+  });
+
+  const { data: events = [] } = useQuery({
+    queryKey: ["events"],
+    queryFn: () => api.events.getAll(),
+  });
+
+  const createTaskMutation = useMutation({
+    mutationFn: api.tasks.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  const createEventMutation = useMutation({
+    mutationFn: api.events.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+
+  const membersMap = useMemo(() => {
+    return new Map(members.map((m) => [m.id, m] as const));
+  }, [members]);
 
   const filteredTasks = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -747,45 +660,43 @@ export default function WorkspacePage() {
       const p = projects.find((x) => x.id === t.projectId)?.name ?? "";
       return (
         t.title.toLowerCase().includes(q) ||
-        statusLabel[t.status].toLowerCase().includes(q) ||
+        statusLabel[t.status as Status]?.toLowerCase().includes(q) ||
         t.priority.toLowerCase().includes(q) ||
         p.toLowerCase().includes(q)
       );
     });
-  }, [query, tasks]);
+  }, [query, tasks, projects]);
 
   function onCreate() {
-    const id = `t${Math.floor(1000 + Math.random() * 9000)}`;
-    const newTask: Task = {
-      id,
+    if (projects.length === 0 || members.length === 0) return;
+    
+    createTaskMutation.mutate({
       title: "New task (draft)",
       status: "todo",
       projectId: projects[0].id,
       assigneeIds: [members[0].id],
       due: selected,
       priority: "Medium",
-    };
-    setTasks((prev) => [newTask, ...prev]);
+    });
   }
 
   function addQuickEvent() {
-    const id = `e${Math.floor(1000 + Math.random() * 9000)}`;
-    const e: Event = {
-      id,
+    if (members.length < 2) return;
+    
+    createEventMutation.mutate({
       title: "New event",
       start: selected,
       color: "primary",
-      attendees: [members[0].id, members[1].id],
-    };
-    setEvents((prev) => [e, ...prev]);
+      attendeeIds: [members[0].id, members[1].id],
+    });
   }
 
   return (
     <AppShell>
-      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} />
+      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} />
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
-        <LeftRail active={active} setActive={setActive} />
+        <LeftRail active={active} setActive={setActive} projects={projects} tasks={tasks} />
 
         <div className="min-w-0">
           <Tabs
@@ -833,7 +744,7 @@ export default function WorkspacePage() {
                     <Separator className="my-3" />
                     <div className="space-y-2">
                       {filteredTasks.slice(0, 5).map((t) => (
-                        <TaskRow key={t.id} t={t} membersMap={membersMap} />
+                        <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} />
                       ))}
                     </div>
                   </Card>
@@ -939,7 +850,7 @@ export default function WorkspacePage() {
 
                 <div className="space-y-2">
                   {filteredTasks.map((t) => (
-                    <TaskRow key={t.id} t={t} membersMap={membersMap} />
+                    <TaskRow key={t.id} t={t} membersMap={membersMap} projects={projects} />
                   ))}
                 </div>
               </div>
