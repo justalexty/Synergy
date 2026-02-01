@@ -86,8 +86,8 @@ function priorityClass(p: string) {
 
 function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="absolute inset-0 bg-grid opacity-[0.55]" />
+    <div className="min-h-screen bg-background crt-lines noise">
+      <div className="absolute inset-0 bg-grid opacity-40" />
       <div className="absolute inset-0 bg-radial" />
       <div className="absolute inset-0 bg-radial-2" />
       <div className="relative mx-auto max-w-[1320px] px-4 pb-12 pt-6 sm:px-6 lg:px-8">
@@ -130,10 +130,10 @@ function TopBar({
                 Synergy
               </div>
               <div
-                className="text-xs text-muted-foreground"
+                className="font-retro text-[11px] text-muted-foreground uppercase tracking-wide"
                 data-testid="text-app-subtitle"
               >
-                Team workflow + calendar workspace
+                ~ workflow terminal v2.0 ~
               </div>
             </div>
           </div>
