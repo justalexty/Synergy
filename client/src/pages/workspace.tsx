@@ -1332,11 +1332,10 @@ export default function WorkspacePage() {
             {active === "tasks" ? (
               <div className="space-y-4">
                 <div className="rounded-2xl border bg-card/70 p-4 shadow-soft">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center justify-between">
                     <div className="font-display text-2xl font-[720] tracking-[-0.03em]" data-testid="text-tasks-title">
                       Tasks
                     </div>
-
                     <div className="flex items-center gap-2">
                       <Button
                         variant="secondary"
