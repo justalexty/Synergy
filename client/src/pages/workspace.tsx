@@ -1679,7 +1679,7 @@ export default function WorkspacePage() {
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-event-date">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {(!isNewEvent || eventDateTouched) && selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
+                      {selectedEvent.start ? format(new Date(selectedEvent.start), "MMMM d, yyyy") : ""}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -1691,7 +1691,6 @@ export default function WorkspacePage() {
                           const existing = new Date(selectedEvent.start);
                           date.setHours(existing.getHours(), existing.getMinutes());
                           setSelectedEvent({ ...selectedEvent, start: date });
-                          setEventDateTouched(true);
                         }
                       }}
                       initialFocus
