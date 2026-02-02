@@ -987,7 +987,7 @@ function MonthGrid({
                   <div
                     key={item.id}
                     className={cn(
-                      "truncate rounded-md px-1.5 py-0.5 text-[10px] leading-tight sm:px-2 sm:py-1 sm:text-[11px]",
+                      "truncate rounded-md px-2 py-1 text-[11px]",
                       item.type === "task"
                         ? "bg-[hsl(355_45%_95%)] text-[hsl(var(--foreground))]"
                         : "bg-[hsl(var(--primary)/0.14)] text-[hsl(var(--primary))]",
@@ -998,7 +998,7 @@ function MonthGrid({
                   </div>
                 ))}
                 {dayItems.length > 2 ? (
-                  <div className="text-[10px] text-muted-foreground sm:text-[11px]" data-testid={`text-more-${key}`}>
+                  <div className="text-[11px] text-muted-foreground" data-testid={`text-more-${key}`}>
                     +{dayItems.length - 2} more
                   </div>
                 ) : null}
