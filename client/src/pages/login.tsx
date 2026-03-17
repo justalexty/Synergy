@@ -1,10 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Handshake, Wallet, ShieldX } from "lucide-react";
-import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
+import { BrowserProvider } from "ethers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import "@/lib/web3modal";
+
+// Client-side approved wallets (case-insensitive check)
+const APPROVED_WALLETS: Record<string, string> = {
+  "0xf391eee70a073e9ed53ebd3b9836644fdfe1b7c6": "Alex",
+  "0xe701998a8fe6523b053df9d9a2e300f7bb27e320": "Joseph",
+};
+
+function verifyWallet(address: string): { authorized: boolean; userName?: string } {
+  const entry = APPROVED_WALLETS[address.toLowerCase()];
+  return entry ? { authorized: true, userName: entry } : { authorized: false };
+}
 
 type Props = {
   onAuthenticated: (address: string, userName: string) => void;
@@ -13,101 +23,49 @@ type Props = {
 export default function LoginPage({ onAuthenticated }: Props) {
   const [status, setStatus] = useState<"idle" | "connecting" | "verifying" | "denied">("idle");
   const [error, setError] = useState<string | null>(null);
-  const pendingVerification = useRef(false);
-  
-  const { open } = useAppKit();
-  const { address, isConnected } = useAppKitAccount();
-  const { disconnect } = useDisconnect();
-
-  useEffect(() => {
-    async function verifyWallet() {
-      if (isConnected && address && pendingVerification.current) {
-        pendingVerification.current = false;
-        setStatus("verifying");
-        setError(null);
-
-        try {
-          console.log("[login:effect] Calling /api/auth/verify for", address);
-          const res = await fetch("/api/auth/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ walletAddress: address }),
-          });
-
-          console.log("[login:effect] Response status:", res.status);
-          const data = await res.json();
-          console.log("[login:effect] Response data:", JSON.stringify(data));
-
-          if (data.authorized === true) {
-            console.log("[login:effect] Authorized!");
-            onAuthenticated(address, data.userName || "User");
-          } else {
-            console.log("[login:effect] Not authorized, data.authorized =", data.authorized);
-            setStatus("denied");
-          }
-        } catch (err: any) {
-          console.error("[login:effect] Error:", err);
-          setError(err?.message || "Verification failed");
-          setStatus("idle");
-        }
-      }
-    }
-
-    verifyWallet();
-  }, [isConnected, address, onAuthenticated]);
+  const [deniedAddress, setDeniedAddress] = useState<string | null>(null);
 
   async function handleLogin() {
-    console.log("[login] handleLogin called, isConnected:", isConnected, "address:", address);
     setStatus("connecting");
     setError(null);
-    pendingVerification.current = true;
-
-    if (isConnected && address) {
-      console.log("[login] Already connected, verifying wallet:", address);
-      setStatus("verifying");
-      try {
-        console.log("[login] Calling /api/auth/verify...");
-        const res = await fetch("/api/auth/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ walletAddress: address }),
-        });
-
-        console.log("[login] Response status:", res.status);
-        const data = await res.json();
-        console.log("[login] Response data:", JSON.stringify(data));
-
-        if (data.authorized === true) {
-          console.log("[login] Authorized! Calling onAuthenticated");
-          onAuthenticated(address, data.userName || "User");
-        } else {
-          console.log("[login] Not authorized, data.authorized =", data.authorized);
-          setStatus("denied");
-        }
-      } catch (err: any) {
-        console.error("[login] Error verifying:", err);
-        setError(err?.message || "Verification failed");
-        setStatus("idle");
-      }
-      return;
-    }
 
     try {
-      await open();
+      const eth = (window as any).ethereum;
+      if (!eth) {
+        setError("No wallet detected. Please install MetaMask or another Web3 wallet.");
+        setStatus("idle");
+        return;
+      }
+
+      await eth.request({ method: "eth_requestAccounts" });
+      const provider = new BrowserProvider(eth);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+
+      setStatus("verifying");
+      const result = verifyWallet(address);
+
+      if (result.authorized) {
+        onAuthenticated(address, result.userName || "User");
+      } else {
+        setDeniedAddress(address);
+        setStatus("denied");
+      }
     } catch (err: any) {
+      if (err?.code === 4001) {
+        // User rejected the connection
+        setStatus("idle");
+        return;
+      }
       setError(err?.message || "Connection failed");
       setStatus("idle");
-      pendingVerification.current = false;
     }
   }
 
-  async function handleTryAgain() {
-    try {
-      await disconnect();
-    } catch {}
+  function handleTryAgain() {
     setStatus("idle");
     setError(null);
-    pendingVerification.current = false;
+    setDeniedAddress(null);
   }
 
   return (
@@ -147,9 +105,9 @@ export default function LoginPage({ onAuthenticated }: Props) {
                   <p className="text-sm text-muted-foreground mt-1">
                     Your wallet is not authorized to access this workspace.
                   </p>
-                  {address && (
+                  {deniedAddress && (
                     <p className="text-xs text-muted-foreground/70 mt-2 font-mono break-all">
-                      {address}
+                      {deniedAddress}
                     </p>
                   )}
                 </div>
