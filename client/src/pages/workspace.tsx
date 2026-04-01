@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 const _memberColorSafelist = [
   "from-rose-400/40", "to-pink-300/40",
@@ -27,11 +27,13 @@ import {
   ChevronRight,
   Filter,
   Handshake,
+  KeyRound,
   LayoutGrid,
   LogOut,
   Pencil,
   Plus,
   Search,
+  Settings,
   Trash2,
   User,
   Users,
@@ -72,7 +74,7 @@ import {
 import WalletConnectButton from "@/components/walletconnect-button";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
-import type { Member, Project, Task, Event } from "@shared/schema";
+import type { Member, Project, Task, Event } from "@/lib/types";
 
 type Status = "todo" | "in_progress" | "blocked" | "done";
 
@@ -271,6 +273,63 @@ function EmojiDisplay({ emoji, className }: { emoji: string; className?: string 
   return <span className={className}>{emoji}</span>;
 }
 
+function GitHubTokenDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [token, setToken] = useState(() => sessionStorage.getItem("synergy_github_token") || "");
+  const hasToken = !!sessionStorage.getItem("synergy_github_token");
+
+  function handleSave() {
+    if (token.trim()) {
+      api.setToken(token.trim());
+    } else {
+      api.clearToken();
+    }
+    onClose();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="sm:max-w-md glass">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <KeyRound className="h-4 w-4" />
+            GitHub Token
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-2">
+          <p className="text-sm text-muted-foreground">
+            A GitHub Personal Access Token (PAT) with <code className="bg-muted px-1 rounded text-xs">contents:write</code> permission is required to save changes.
+            The token is stored in <code className="bg-muted px-1 rounded text-xs">sessionStorage</code> and never leaves your browser.
+          </p>
+          <div className="space-y-2">
+            <Label>Personal Access Token</Label>
+            <Input
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="ghp_..."
+              data-testid="input-github-token"
+            />
+          </div>
+          {hasToken && (
+            <p className="text-xs text-green-600 dark:text-green-400">✓ Token is currently set</p>
+          )}
+          <div className="flex justify-between gap-2 pt-2">
+            {hasToken && (
+              <Button variant="outline" onClick={() => { api.clearToken(); setToken(""); }} size="sm">
+                Clear Token
+              </Button>
+            )}
+            <div className="flex gap-2 ml-auto">
+              <Button variant="secondary" onClick={onClose}>Cancel</Button>
+              <Button onClick={handleSave}>Save</Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function ProjectForm({
   project,
   onSave,
@@ -450,6 +509,7 @@ function TopBar({
   setFilters: (f: Filters) => void;
   userName?: string | null;
   onLogout?: () => void;
+  onOpenTokenSettings?: () => void;
 }) {
   const hasActiveFilters = filters.status.length > 0 || filters.priority.length > 0 || filters.projectId || filters.assigneeId;
   const toggleStatus = (s: string) => {
@@ -501,6 +561,11 @@ function TopBar({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>{userName}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onOpenTokenSettings} data-testid="button-token-settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  GitHub Token
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onLogout} data-testid="button-logout">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -1161,6 +1226,14 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
   const [eventTimeTouched, setEventTimeTouched] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingProject, setIsAddingProject] = useState(false);
+  const [isTokenDialogOpen, setIsTokenDialogOpen] = useState(false);
+
+  // Auto-open token dialog if no token is set
+  useEffect(() => {
+    if (!api.hasToken()) {
+      setIsTokenDialogOpen(true);
+    }
+  }, []);
   const [metricFilter, setMetricFilter] = useState<"week" | "progress" | "focus" | null>(null);
   const [filters, setFilters] = useState<{
     status: string[];
@@ -1438,7 +1511,7 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
 
   return (
     <AppShell>
-      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} projects={projects} filters={filters} setFilters={setFilters} userName={userName} onLogout={onLogout} />
+      <TopBar query={query} setQuery={setQuery} onCreate={onCreate} members={members} projects={projects} filters={filters} setFilters={setFilters} userName={userName} onLogout={onLogout} onOpenTokenSettings={() => setIsTokenDialogOpen(true)} />
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr]">
         <LeftRail 
           active={active} 
@@ -2046,6 +2119,7 @@ export default function WorkspacePage({ userName, onLogout }: WorkspaceProps) {
           />
         </DialogContent>
       </Dialog>
+      <GitHubTokenDialog open={isTokenDialogOpen} onClose={() => setIsTokenDialogOpen(false)} />
     </AppShell>
   );
 }
