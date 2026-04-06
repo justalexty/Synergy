@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Handshake, Wallet, ShieldX } from "lucide-react";
+import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { BrowserProvider } from "ethers";
+import type { Provider } from "ethers";
+import "@/lib/web3modal"; // Initialize AppKit
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -25,35 +29,53 @@ export default function LoginPage({ onAuthenticated }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [deniedAddress, setDeniedAddress] = useState<string | null>(null);
 
-  async function handleLogin() {
-    setStatus("connecting");
-    setError(null);
+  const { address, isConnected } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider("eip155");
 
-    try {
-      const eth = (window as any).ethereum;
-      if (!eth) {
-        setError("No wallet detected. Please install MetaMask or another Web3 wallet.");
-        setStatus("idle");
-        return;
-      }
-
-      await eth.request({ method: "eth_requestAccounts" });
-      const provider = new BrowserProvider(eth);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-
+  // When wallet connects via AppKit, verify
+  useEffect(() => {
+    if (isConnected && address && status !== "denied") {
       setStatus("verifying");
       const result = verifyWallet(address);
-
       if (result.authorized) {
         onAuthenticated(address, result.userName || "User");
       } else {
         setDeniedAddress(address);
         setStatus("denied");
       }
+    }
+  }, [isConnected, address]);
+
+  async function handleLogin() {
+    setStatus("connecting");
+    setError(null);
+
+    try {
+      // Try injected wallet first (MetaMask etc.)
+      const eth = (window as any).ethereum;
+      if (eth) {
+        await eth.request({ method: "eth_requestAccounts" });
+        const provider = new BrowserProvider(eth);
+        const signer = await provider.getSigner();
+        const addr = await signer.getAddress();
+
+        setStatus("verifying");
+        const result = verifyWallet(addr);
+
+        if (result.authorized) {
+          onAuthenticated(addr, result.userName || "User");
+        } else {
+          setDeniedAddress(addr);
+          setStatus("denied");
+        }
+      } else {
+        // No injected wallet — open AppKit modal (shows QR for WalletConnect)
+        const { appKit } = await import("@/lib/web3modal");
+        appKit.open();
+        setStatus("idle");
+      }
     } catch (err: any) {
       if (err?.code === 4001) {
-        // User rejected the connection
         setStatus("idle");
         return;
       }
@@ -62,10 +84,21 @@ export default function LoginPage({ onAuthenticated }: Props) {
     }
   }
 
+  function handleQRLogin() {
+    // Always open AppKit modal for QR scanning
+    import("@/lib/web3modal").then(({ appKit }) => {
+      appKit.open();
+    });
+  }
+
   function handleTryAgain() {
     setStatus("idle");
     setError(null);
     setDeniedAddress(null);
+    // Disconnect from AppKit if connected
+    import("@/lib/web3modal").then(({ appKit }) => {
+      appKit.disconnect?.();
+    });
   }
 
   return (
@@ -122,7 +155,7 @@ export default function LoginPage({ onAuthenticated }: Props) {
               </Button>
             </div>
           ) : (
-            <div className="w-full">
+            <div className="w-full space-y-3">
               <Button
                 onClick={handleLogin}
                 disabled={status === "connecting" || status === "verifying"}
@@ -138,6 +171,15 @@ export default function LoginPage({ onAuthenticated }: Props) {
                   : status === "verifying"
                     ? "Verifying..."
                     : "Log In"}
+              </Button>
+
+              <Button
+                onClick={handleQRLogin}
+                variant="outline"
+                className="w-full h-12 text-base"
+                data-testid="button-qr-login"
+              >
+                QR Code Login
               </Button>
 
               {error && (

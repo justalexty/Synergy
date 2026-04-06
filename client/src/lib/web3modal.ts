@@ -2,13 +2,13 @@ import { createAppKit } from "@reown/appkit/react";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
 import { mainnet } from "@reown/appkit/networks";
 
-const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
+const projectId = "89d6083434e5c857f7402c7bba817a49";
 
 const metadata = {
   name: "Synergy",
-  description: "Team workflow + calendar workspace",
-  url: typeof window !== "undefined" ? window.location.origin : "https://synergy.app",
-  icons: ["/icon-192.png"],
+  description: "Workflow Terminal",
+  url: typeof window !== "undefined" ? window.location.origin : "https://justalexty.github.io",
+  icons: ["https://justalexty.github.io/Synergy/icon-192.png"],
 };
 
 export const appKit = createAppKit({
